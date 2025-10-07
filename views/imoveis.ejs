@@ -1,0 +1,784 @@
+<!-- Header da página -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Imóveis</h1>
+        <p class="text-gray-600">Gerencie seu portfólio de imóveis para locação</p>
+    </div>
+    <button id="novoImovelBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Novo Imóvel
+    </button>
+</div>
+
+<!-- Cards de resumo -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-home text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Total de Imóveis</p>
+                <p id="totalImoveis" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Imóveis Alugados</p>
+                <p id="imoveisAlugados" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-key text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Disponíveis</p>
+                <p id="imoveisDisponiveis" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100">
+                <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Mensal</p>
+                <p id="receitaMensal" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+            <div class="relative">
+                <input type="text" id="buscarImovel" placeholder="Código, endereço..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+            <select id="filtroTipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="apartamento">Apartamento</option>
+                <option value="casa">Casa</option>
+                <option value="comercial">Comercial</option>
+                <option value="terreno">Terreno</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="disponivel">Disponível</option>
+                <option value="alugado">Alugado</option>
+                <option value="manutencao">Manutenção</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+            <select id="filtroValor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="0-1000">Até R$ 1.000</option>
+                <option value="1000-2000">R$ 1.000 - R$ 2.000</option>
+                <option value="2000-5000">R$ 2.000 - R$ 5.000</option>
+                <option value="5000+">Acima de R$ 5.000</option>
+            </select>
+        </div>
+        
+        <div class="flex items-end">
+            <button id="limparFiltros" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                <i class="fas fa-times mr-2"></i>
+                Limpar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de imóveis -->
+<div class="bg-white rounded-lg shadow-sm">
+    <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Lista de Imóveis</h2>
+            <div class="flex items-center space-x-4">
+                <span id="totalImoveisLista" class="text-sm text-gray-500">0 imóveis encontrados</span>
+                <div class="flex items-center space-x-2">
+                    <button id="visualizacaoGrid" class="p-2 text-blue-600">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button id="visualizacaoLista" class="p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grid de imóveis -->
+    <div id="gridImoveis" class="p-6">
+        <div id="listaImoveis" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Será preenchido via JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Tabela de imóveis -->
+    <div id="tabelaImoveis" class="hidden overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imóvel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inquilino</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaImoveis" class="bg-white divide-y divide-gray-200">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loadingImoveis" class="hidden p-8 text-center">
+        <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+            <span class="text-gray-600">Carregando imóveis...</span>
+        </div>
+    </div>
+    
+    <!-- Empty state -->
+    <div id="emptyStateImoveis" class="hidden p-8 text-center">
+        <i class="fas fa-home text-4xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum imóvel encontrado</h3>
+        <p class="text-gray-500 mb-4">Comece adicionando seu primeiro imóvel ao portfólio.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Adicionar Imóvel
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Imóvel -->
+<div id="modalImovel" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="tituloModalImovel" class="text-lg font-semibold text-gray-900">Novo Imóvel</h3>
+                <button id="fecharModalImovel" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form id="formImovel" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Informações básicas -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Informações Básicas</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Código do Imóvel *</label>
+                    <input type="text" id="codigoImovel" name="codigo" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ex: APT001">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Imóvel *</label>
+                    <select id="tipoImovel" name="tipo" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o tipo</option>
+                        <option value="apartamento">Apartamento</option>
+                        <option value="casa">Casa</option>
+                        <option value="comercial">Comercial</option>
+                        <option value="terreno">Terreno</option>
+                    </select>
+                </div>
+                
+                <!-- Endereço -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Endereço</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CEP *</label>
+                    <input type="text" id="cepImovel" name="cep" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Logradouro *</label>
+                    <input type="text" id="logradouroImovel" name="endereco" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Número *</label>
+                    <input type="text" id="numeroImovel" name="numero" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Complemento</label>
+                    <input type="text" id="complementoImovel" name="complemento"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bairro *</label>
+                    <input type="text" id="bairroImovel" name="bairro" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cidade *</label>
+                    <input type="text" id="cidadeImovel" name="cidade" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Características -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Características</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quartos</label>
+                    <input type="number" id="quartosImovel" name="quartos" min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Banheiros</label>
+                    <input type="number" id="banheirosImovel" name="banheiros" min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Área (m²)</label>
+                    <input type="number" id="areaImovel" name="area" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vagas de Garagem</label>
+                    <input type="number" id="vagasImovel" name="vagas" min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Valores -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Valores</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Aluguel *</label>
+                    <input type="number" id="valorAluguelImovel" name="valorAluguel" required min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Condomínio</label>
+                    <input type="number" id="valorCondominioImovel" name="valorCondominio" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do IPTU</label>
+                    <input type="number" id="valorIptuImovel" name="valorIptu" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select id="statusImovel" name="status"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="disponivel">Disponível</option>
+                        <option value="alugado">Alugado</option>
+                        <option value="manutencao">Em Manutenção</option>
+                    </select>
+                </div>
+                
+                <!-- Observações -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Observações</label>
+                    <textarea id="observacoesImovel" name="observacoes" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Informações adicionais sobre o imóvel..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelarImovel" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar Imóvel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let imoveis = [];
+    let imovelEditando = null;
+    let visualizacaoAtual = 'grid';
+    
+    // Elementos do DOM
+    const modalImovel = document.getElementById('modalImovel');
+    const formImovel = document.getElementById('formImovel');
+    const tituloModal = document.getElementById('tituloModalImovel');
+    const listaImoveis = document.getElementById('listaImoveis');
+    const corpoTabela = document.getElementById('corpoTabelaImoveis');
+    const loadingImoveis = document.getElementById('loadingImoveis');
+    const emptyState = document.getElementById('emptyStateImoveis');
+    
+    // Event listeners
+    document.getElementById('novoImovelBtn').addEventListener('click', () => abrirModalImovel());
+    document.getElementById('fecharModalImovel').addEventListener('click', fecharModalImovel);
+    document.getElementById('cancelarImovel').addEventListener('click', fecharModalImovel);
+    document.getElementById('buscarImovel').addEventListener('input', debounce(filtrarImoveis, 300));
+    document.getElementById('filtroTipo').addEventListener('change', filtrarImoveis);
+    document.getElementById('filtroStatus').addEventListener('change', filtrarImoveis);
+    document.getElementById('filtroValor').addEventListener('change', filtrarImoveis);
+    document.getElementById('limparFiltros').addEventListener('click', limparFiltros);
+    
+    document.getElementById('visualizacaoGrid').addEventListener('click', () => alterarVisualizacao('grid'));
+    document.getElementById('visualizacaoLista').addEventListener('click', () => alterarVisualizacao('lista'));
+    
+    formImovel.addEventListener('submit', salvarImovel);
+    
+    // Máscara para CEP
+    document.getElementById('cepImovel').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+    });
+    
+    // Buscar CEP
+    document.getElementById('cepImovel').addEventListener('blur', async function(e) {
+        const cep = e.target.value.replace(/\D/g, '');
+        
+        if (cep.length === 8) {
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                
+                if (!data.erro) {
+                    document.getElementById('logradouroImovel').value = data.logradouro;
+                    document.getElementById('bairroImovel').value = data.bairro;
+                    document.getElementById('cidadeImovel').value = data.localidade;
+                }
+            } catch (error) {
+                console.error('Erro ao buscar CEP:', error);
+            }
+        }
+    });
+    
+    // Carregar imóveis
+    async function carregarImoveis() {
+        try {
+            mostrarLoading(true);
+            
+            const response = await utils.request('/api/imoveis');
+            imoveis = response.data || [];
+            
+            atualizarResumo();
+            renderizarImoveis();
+            
+        } catch (error) {
+            console.error('Erro ao carregar imóveis:', error);
+            utils.showToast('Erro ao carregar imóveis', 'error');
+            mostrarEmptyState(true);
+        } finally {
+            mostrarLoading(false);
+        }
+    }
+    
+    // Atualizar resumo
+    function atualizarResumo() {
+        const total = imoveis.length;
+        const alugados = imoveis.filter(i => i.status === 'alugado').length;
+        const disponiveis = imoveis.filter(i => i.status === 'disponivel').length;
+        const receitaMensal = imoveis
+            .filter(i => i.status === 'alugado')
+            .reduce((total, i) => total + (parseFloat(i.valorAluguel) || 0), 0);
+        
+        document.getElementById('totalImoveis').textContent = total;
+        document.getElementById('imoveisAlugados').textContent = alugados;
+        document.getElementById('imoveisDisponiveis').textContent = disponiveis;
+        document.getElementById('receitaMensal').textContent = utils.formatCurrency(receitaMensal);
+    }
+    
+    // Renderizar imóveis
+    function renderizarImoveis() {
+        const imoveisFiltrados = filtrarImoveisArray();
+        
+        document.getElementById('totalImoveisLista').textContent = `${imoveisFiltrados.length} imóvel(is) encontrado(s)`;
+        
+        if (imoveisFiltrados.length === 0) {
+            mostrarEmptyState(true);
+            return;
+        }
+        
+        mostrarEmptyState(false);
+        
+        if (visualizacaoAtual === 'grid') {
+            renderizarGrid(imoveisFiltrados);
+        } else {
+            renderizarTabela(imoveisFiltrados);
+        }
+    }
+    
+    // Renderizar grid
+    function renderizarGrid(imoveis) {
+        listaImoveis.innerHTML = imoveis.map(imovel => `
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+                <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                    <i class="fas fa-home text-white text-4xl"></i>
+                </div>
+                
+                <div class="p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900">${imovel.codigo}</h3>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(imovel.status)}">
+                            ${getStatusText(imovel.status)}
+                        </span>
+                    </div>
+                    
+                    <p class="text-sm text-gray-600 mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        ${imovel.endereco}, ${imovel.numero} - ${imovel.bairro}
+                    </p>
+                    
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+                        <span><i class="fas fa-bed mr-1"></i>${imovel.quartos || 0} quartos</span>
+                        <span><i class="fas fa-bath mr-1"></i>${imovel.banheiros || 0} banheiros</span>
+                        <span><i class="fas fa-car mr-1"></i>${imovel.vagas || 0} vagas</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-bold text-green-600">${utils.formatCurrency(imovel.valorAluguel)}</p>
+                            <p class="text-xs text-gray-500">por mês</p>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="editarImovel('${imovel.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="verImovel('${imovel.id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="excluirImovel('${imovel.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Renderizar tabela
+    function renderizarTabela(imoveis) {
+        corpoTabela.innerHTML = imoveis.map(imovel => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-home text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${imovel.codigo}</div>
+                            <div class="text-sm text-gray-500">${imovel.endereco}, ${imovel.numero}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                        ${imovel.tipo}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${utils.formatCurrency(imovel.valorAluguel)}</div>
+                    <div class="text-sm text-gray-500">por mês</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(imovel.status)}">
+                        ${getStatusText(imovel.status)}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${imovel.inquilino || 'Não informado'}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <button onclick="editarImovel('${imovel.id}')" class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="verImovel('${imovel.id}')" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="excluirImovel('${imovel.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    // Alterar visualização
+    function alterarVisualizacao(tipo) {
+        visualizacaoAtual = tipo;
+        
+        document.getElementById('visualizacaoGrid').classList.toggle('text-blue-600', tipo === 'grid');
+        document.getElementById('visualizacaoGrid').classList.toggle('text-gray-400', tipo !== 'grid');
+        document.getElementById('visualizacaoLista').classList.toggle('text-blue-600', tipo === 'lista');
+        document.getElementById('visualizacaoLista').classList.toggle('text-gray-400', tipo !== 'lista');
+        
+        document.getElementById('gridImoveis').classList.toggle('hidden', tipo === 'lista');
+        document.getElementById('tabelaImoveis').classList.toggle('hidden', tipo === 'grid');
+        
+        renderizarImoveis();
+    }
+    
+    // Filtrar imóveis
+    function filtrarImoveisArray() {
+        const busca = document.getElementById('buscarImovel').value.toLowerCase();
+        const tipo = document.getElementById('filtroTipo').value;
+        const status = document.getElementById('filtroStatus').value;
+        const valor = document.getElementById('filtroValor').value;
+        
+        return imoveis.filter(imovel => {
+            const matchBusca = !busca || 
+                imovel.codigo.toLowerCase().includes(busca) ||
+                imovel.endereco.toLowerCase().includes(busca) ||
+                imovel.bairro.toLowerCase().includes(busca);
+            
+            const matchTipo = !tipo || imovel.tipo === tipo;
+            const matchStatus = !status || imovel.status === status;
+            
+            let matchValor = true;
+            if (valor) {
+                const valorAluguel = parseFloat(imovel.valorAluguel) || 0;
+                switch (valor) {
+                    case '0-1000':
+                        matchValor = valorAluguel <= 1000;
+                        break;
+                    case '1000-2000':
+                        matchValor = valorAluguel > 1000 && valorAluguel <= 2000;
+                        break;
+                    case '2000-5000':
+                        matchValor = valorAluguel > 2000 && valorAluguel <= 5000;
+                        break;
+                    case '5000+':
+                        matchValor = valorAluguel > 5000;
+                        break;
+                }
+            }
+            
+            return matchBusca && matchTipo && matchStatus && matchValor;
+        });
+    }
+    
+    function filtrarImoveis() {
+        renderizarImoveis();
+    }
+    
+    function limparFiltros() {
+        document.getElementById('buscarImovel').value = '';
+        document.getElementById('filtroTipo').value = '';
+        document.getElementById('filtroStatus').value = '';
+        document.getElementById('filtroValor').value = '';
+        filtrarImoveis();
+    }
+    
+    // Modal
+    function abrirModalImovel(imovel = null) {
+        imovelEditando = imovel;
+        tituloModal.textContent = imovel ? 'Editar Imóvel' : 'Novo Imóvel';
+        
+        if (imovel) {
+            preencherFormulario(imovel);
+        } else {
+            formImovel.reset();
+        }
+        
+        modalImovel.classList.remove('hidden');
+    }
+    
+    function fecharModalImovel() {
+        modalImovel.classList.add('hidden');
+        imovelEditando = null;
+        formImovel.reset();
+    }
+    
+    function preencherFormulario(imovel) {
+        Object.keys(imovel).forEach(key => {
+            const input = document.querySelector(`[name="${key}"]`);
+            if (input) {
+                input.value = imovel[key] || '';
+            }
+        });
+    }
+    
+    // Salvar imóvel
+    async function salvarImovel(e) {
+        e.preventDefault();
+        
+        try {
+            utils.showLoading();
+            
+            const formData = new FormData(formImovel);
+            const dadosImovel = Object.fromEntries(formData.entries());
+            
+            let response;
+            if (imovelEditando) {
+                response = await utils.request(`/imoveis/${imovelEditando.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(dadosImovel)
+                });
+            } else {
+                response = await utils.request('/api/imoveis', {
+                    method: 'POST',
+                    body: JSON.stringify(dadosImovel)
+                });
+            }
+            
+            utils.showToast(
+                imovelEditando ? 'Imóvel atualizado com sucesso!' : 'Imóvel criado com sucesso!',
+                'success'
+            );
+            
+            fecharModalImovel();
+            await carregarImoveis();
+            
+        } catch (error) {
+            console.error('Erro ao salvar imóvel:', error);
+            utils.showToast(error.message || 'Erro ao salvar imóvel', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Funções globais
+    window.editarImovel = async function(id) {
+        try {
+            const response = await utils.request(`/imoveis/${id}`);
+            abrirModalImovel(response.data);
+        } catch (error) {
+            console.error('Erro ao carregar imóvel:', error);
+            utils.showToast('Erro ao carregar dados do imóvel', 'error');
+        }
+    };
+    
+    window.verImovel = function(id) {
+        utils.showToast('Funcionalidade em desenvolvimento', 'info');
+    };
+    
+    window.excluirImovel = async function(id) {
+        if (!confirm('Tem certeza que deseja excluir este imóvel?')) {
+            return;
+        }
+        
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/imoveis/${id}`, {
+                method: 'DELETE'
+            });
+            
+            utils.showToast('Imóvel excluído com sucesso!', 'success');
+            await carregarImoveis();
+            
+        } catch (error) {
+            console.error('Erro ao excluir imóvel:', error);
+            utils.showToast(error.message || 'Erro ao excluir imóvel', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    // Utilitários
+    function getStatusClass(status) {
+        const classes = {
+            'disponivel': 'bg-green-100 text-green-800',
+            'alugado': 'bg-blue-100 text-blue-800',
+            'manutencao': 'bg-yellow-100 text-yellow-800'
+        };
+        return classes[status] || 'bg-gray-100 text-gray-800';
+    }
+    
+    function getStatusText(status) {
+        const texts = {
+            'disponivel': 'Disponível',
+            'alugado': 'Alugado',
+            'manutencao': 'Manutenção'
+        };
+        return texts[status] || status;
+    }
+    
+    function mostrarLoading(show) {
+        loadingImoveis.classList.toggle('hidden', !show);
+        document.getElementById('gridImoveis').classList.toggle('hidden', show);
+        document.getElementById('tabelaImoveis').classList.toggle('hidden', show);
+    }
+    
+    function mostrarEmptyState(show) {
+        emptyState.classList.toggle('hidden', !show);
+        document.getElementById('gridImoveis').classList.toggle('hidden', show);
+        document.getElementById('tabelaImoveis').classList.toggle('hidden', show);
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Inicializar - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        carregarImoveis();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                carregarImoveis();
+            }
+        }, 100);
+    }
+});
+</script>

@@ -1,0 +1,694 @@
+<!-- Cabeçalho da página -->
+<div class="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-lg mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">💰 Meu Dinheiro</h1>
+            <p class="text-green-100">Gerencie suas finanças de forma inteligente</p>
+        </div>
+        <div class="text-right">
+            <p class="text-green-100 text-sm">Saldo Atual</p>
+            <p class="text-3xl font-bold" id="saldoAtual">R$ <%= conta.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></p>
+            <p class="text-green-100 text-xs">Conta: <%= conta.numero %> | Agência: <%= conta.agencia %></p>
+        </div>
+    </div>
+</div>
+
+<!-- Menu de navegação do módulo -->
+<div class="bg-white rounded-lg shadow-sm mb-6">
+    <div class="flex border-b">
+        <button class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-green-500 text-green-600" data-tab="resumo">
+            📊 Resumo
+        </button>
+        <button class="tab-button px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="extrato">
+            📄 Extrato
+        </button>
+        <button class="tab-button px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="transferencias">
+            🔄 Transferências
+        </button>
+        <button class="tab-button px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700" data-tab="pague-contas">
+            💳 Pague Contas
+        </button>
+    </div>
+</div>
+
+<!-- Conteúdo das abas -->
+<div id="content-container">
+    
+    <!-- Aba Resumo -->
+    <div id="tab-resumo" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Resumo Financeiro -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    📈 Resumo Financeiro
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Saldo Disponível</span>
+                        <span class="font-semibold text-green-600">R$ <%= conta.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Receitas do Mês</span>
+                        <span class="font-semibold text-blue-600">R$ 4.300,00</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Despesas do Mês</span>
+                        <span class="font-semibold text-red-600">R$ 1.770,50</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <span class="text-sm text-gray-600">Resultado do Mês</span>
+                        <span class="font-semibold text-purple-600">R$ 2.529,50</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contas Pendentes -->
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    ⏰ Contas Pendentes
+                </h3>
+                
+                <div class="space-y-3" id="contasPendentesResumo">
+                    <% contasPendentes.forEach(conta => { %>
+                    <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-sm"><%= conta.descricao %></p>
+                            <p class="text-xs text-gray-500">Vence em <%= new Date(conta.vencimento).toLocaleDateString('pt-BR') %></p>
+                        </div>
+                        <span class="font-semibold text-yellow-600">R$ <%= conta.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></span>
+                    </div>
+                    <% }); %>
+                </div>
+                
+                <button class="w-full mt-4 bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors" onclick="switchTab('pague-contas')">
+                    Ver Todas as Contas
+                </button>
+            </div>
+            
+        </div>
+        
+        <!-- Extrato Recente -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold flex items-center">
+                    📋 Movimentações Recentes
+                </h3>
+                <button class="text-green-600 hover:text-green-700 text-sm font-medium" onclick="switchTab('extrato')">
+                    Ver Extrato Completo →
+                </button>
+            </div>
+            
+            <div class="space-y-3" id="extratoRecente">
+                <% extratoRecente.forEach(transacao => { %>
+                <div class="flex justify-between items-center p-3 border-l-4 <%= transacao.tipo === 'credito' ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50' %>">
+                    <div>
+                        <p class="font-medium text-sm"><%= transacao.descricao %></p>
+                        <p class="text-xs text-gray-500"><%= new Date(transacao.data).toLocaleDateString('pt-BR') %> • <%= transacao.categoria %></p>
+                    </div>
+                    <span class="font-semibold <%= transacao.tipo === 'credito' ? 'text-green-600' : 'text-red-600' %>">
+                        <%= transacao.tipo === 'credito' ? '+' : '-' %>R$ <%= transacao.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %>
+                    </span>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Aba Extrato -->
+    <div id="tab-extrato" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold">📄 Extrato Detalhado</h3>
+                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors" onclick="exportarExtrato()">
+                    📥 Exportar PDF
+                </button>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    <select id="filtroTipo" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="todos">Todos</option>
+                        <option value="credito">Créditos</option>
+                        <option value="debito">Débitos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data Início</label>
+                    <input type="date" id="dataInicio" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data Fim</label>
+                    <input type="date" id="dataFim" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div class="flex items-end">
+                    <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" onclick="filtrarExtrato()">
+                        🔍 Filtrar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Lista de transações -->
+            <div id="listaExtrato" class="space-y-3">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            
+            <!-- Paginação -->
+            <div id="paginacaoExtrato" class="flex justify-center mt-6">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Aba Transferências -->
+    <div id="tab-transferencias" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-semibold mb-6">🔄 Transferências</h3>
+            
+            <form id="formTransferencia" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Transferência</label>
+                        <select id="tipoTransferencia" name="tipo" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="ted">TED - Transferência Eletrônica</option>
+                            <option value="doc">DOC - Documento de Crédito</option>
+                            <option value="pix">PIX - Pagamento Instantâneo</option>
+                            <option value="interna">Transferência Interna</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+                        <input type="number" id="valorTransferencia" name="valor" step="0.01" min="0.01" 
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2" 
+                               placeholder="0,00" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Conta de Destino</label>
+                    <input type="text" id="contaDestino" name="contaDestino" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2" 
+                           placeholder="Banco, Agência, Conta ou Chave PIX" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição (Opcional)</label>
+                    <input type="text" id="descricaoTransferencia" name="descricao" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2" 
+                           placeholder="Descrição da transferência">
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" onclick="limparFormTransferencia()">
+                        Limpar
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        💸 Realizar Transferência
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Aba Pague Contas -->
+    <div id="tab-pague-contas" class="tab-content hidden">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold">💳 Pague Contas</h3>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" onclick="adicionarConta()">
+                    ➕ Adicionar Conta
+                </button>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="flex space-x-4 mb-6">
+                <button class="filtro-conta active px-4 py-2 rounded-lg bg-blue-600 text-white" data-status="todos">
+                    Todas
+                </button>
+                <button class="filtro-conta px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300" data-status="pendente">
+                    Pendentes
+                </button>
+                <button class="filtro-conta px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300" data-status="paga">
+                    Pagas
+                </button>
+            </div>
+            
+            <!-- Lista de contas -->
+            <div id="listaContas" class="space-y-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Modal para pagamento de conta -->
+<div id="modalPagamento" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-lg font-semibold">💳 Pagar Conta</h4>
+                <button onclick="fecharModalPagamento()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="formPagamento">
+                <input type="hidden" id="contaIdPagamento">
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                        <p id="descricaoPagamento" class="text-sm text-gray-600 p-2 bg-gray-50 rounded"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Valor Original</label>
+                        <p id="valorOriginalPagamento" class="text-sm text-gray-600 p-2 bg-gray-50 rounded"></p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Valor a Pagar</label>
+                        <input type="number" id="valorPagamento" step="0.01" min="0.01" 
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="fecharModalPagamento()" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        💰 Confirmar Pagamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variáveis globais
+let extratoAtual = [];
+let contasAtual = [];
+let paginaAtual = 1;
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    carregarExtrato();
+    carregarContas();
+    
+    // Event listeners para abas
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
+            switchTab(tabId);
+        });
+    });
+    
+    // Event listeners para filtros de contas
+    document.querySelectorAll('.filtro-conta').forEach(button => {
+        button.addEventListener('click', function() {
+            const status = this.dataset.status;
+            filtrarContas(status);
+            
+            // Atualizar visual dos botões
+            document.querySelectorAll('.filtro-conta').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            this.classList.add('bg-blue-600', 'text-white');
+        });
+    });
+    
+    // Event listener para formulário de transferência
+    document.getElementById('formTransferencia').addEventListener('submit', realizarTransferencia);
+    
+    // Event listener para formulário de pagamento
+    document.getElementById('formPagamento').addEventListener('submit', pagarConta);
+});
+
+// Função para trocar de aba
+function switchTab(tabId) {
+    // Esconder todas as abas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+    });
+    
+    // Mostrar aba selecionada
+    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+    
+    // Atualizar botões
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active', 'border-green-500', 'text-green-600');
+        button.classList.add('text-gray-500');
+    });
+    
+    const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
+    activeButton.classList.add('active', 'border-green-500', 'text-green-600');
+    activeButton.classList.remove('text-gray-500');
+}
+
+// Função para carregar dados da conta
+async function carregarDadosConta() {
+    try {
+        const response = await utils.request('/api/financeiro/api/conta');
+        if (response.success) {
+            document.getElementById('saldoAtual').textContent = 
+                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(response.data.saldo);
+            document.getElementById('contaNumero').textContent = 
+                `Ag: ${response.data.agencia} • CC: ${response.data.contaNumero}`;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar dados da conta:', error);
+        utils.showNotification('Erro ao carregar dados da conta', 'error');
+    }
+}
+
+// Função para carregar extrato
+async function carregarExtrato(page = 1, filtros = {}) {
+    try {
+        const params = new URLSearchParams({
+            page: page,
+            limit: 10,
+            ...filtros
+        });
+        
+        const response = await utils.request(`/api/financeiro/api/extrato?${params}`);
+        if (response.success) {
+            extratoAtual = response.data;
+            renderizarExtrato(response.data);
+            renderizarPaginacaoExtrato(response.pagination);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar extrato:', error);
+        utils.showNotification('Erro ao carregar extrato', 'error');
+    }
+}
+
+// Função para renderizar extrato
+function renderizarExtrato(transacoes) {
+    const container = document.getElementById('listaExtrato');
+    
+    if (transacoes.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p>Nenhuma transação encontrada</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = transacoes.map(transacao => {
+        const isCredito = transacao.valor > 0;
+        return `
+            <div class="flex justify-between items-center p-4 border-l-4 ${isCredito ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'} rounded-r-lg">
+                <div class="flex-1">
+                    <p class="font-medium">${transacao.descricao}</p>
+                    <p class="text-sm text-gray-500">${transacao.data} • ${transacao.categoria}</p>
+                    <span class="inline-block px-2 py-1 text-xs rounded-full ${transacao.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${transacao.status}</span>
+                </div>
+                <div class="text-right">
+                    <span class="font-semibold text-lg ${isCredito ? 'text-green-600' : 'text-red-600'}">
+                        ${transacao.valorFormatado}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Função para renderizar paginação do extrato
+function renderizarPaginacaoExtrato(pagination) {
+    const container = document.getElementById('paginacaoExtrato');
+    
+    if (pagination.totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Botão anterior
+    if (pagination.currentPage > 1) {
+        paginationHTML += `<button onclick="carregarExtrato(${pagination.currentPage - 1})" class="px-3 py-2 mx-1 bg-gray-200 rounded hover:bg-gray-300">Anterior</button>`;
+    }
+    
+    // Números das páginas
+    for (let i = 1; i <= pagination.totalPages; i++) {
+        if (i === pagination.currentPage) {
+            paginationHTML += `<button class="px-3 py-2 mx-1 bg-green-600 text-white rounded">${i}</button>`;
+        } else {
+            paginationHTML += `<button onclick="carregarExtrato(${i})" class="px-3 py-2 mx-1 bg-gray-200 rounded hover:bg-gray-300">${i}</button>`;
+        }
+    }
+    
+    // Botão próximo
+    if (pagination.hasMore) {
+        paginationHTML += `<button onclick="carregarExtrato(${pagination.currentPage + 1})" class="px-3 py-2 mx-1 bg-gray-200 rounded hover:bg-gray-300">Próximo</button>`;
+    }
+    
+    container.innerHTML = paginationHTML;
+}
+
+// Função para filtrar extrato
+function filtrarExtrato() {
+    const filtros = {
+        tipo: document.getElementById('filtroTipo').value,
+        dataInicio: document.getElementById('dataInicio').value,
+        dataFim: document.getElementById('dataFim').value
+    };
+    
+    // Remover filtros vazios
+    Object.keys(filtros).forEach(key => {
+        if (!filtros[key] || filtros[key] === 'todos') {
+            delete filtros[key];
+        }
+    });
+    
+    carregarExtrato(1, filtros);
+}
+
+// Função para carregar contas
+async function carregarContas(status = 'todos') {
+    try {
+        const response = await utils.request(`/api/financeiro/api/contas-pagar?status=${status}`);
+        if (response.success) {
+            contasAtual = response.data;
+            renderizarContas(response.data);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar contas:', error);
+        utils.showNotification('Erro ao carregar contas', 'error');
+    }
+}
+
+// Função para renderizar contas
+function renderizarContas(contas) {
+    const container = document.getElementById('listaContas');
+    
+    if (contas.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p>Nenhuma conta encontrada</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = contas.map(conta => `
+        <div class="border rounded-lg p-4 ${conta.status === 'CONFIRMED' ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h4 class="font-medium">${conta.descricao}</h4>
+                    <p class="text-sm text-gray-500 mt-1">
+                        ${conta.vencimento ? `Vencimento: ${conta.vencimento}` : 'Data: ' + conta.data}
+                    </p>
+                    ${conta.codigoBarras ? `<p class="text-xs text-gray-400 mt-1 font-mono">${conta.codigoBarras}</p>` : ''}
+                    <span class="inline-block px-2 py-1 text-xs rounded-full mt-2 ${conta.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                        ${conta.status}
+                    </span>
+                </div>
+                <div class="text-right">
+                    <span class="font-semibold text-lg">${conta.valorFormatado}</span>
+                    ${conta.status !== 'CONFIRMED' ? `
+                        <button onclick="pagarConta('${conta.id}', '${conta.codigoBarras}', ${conta.valor})" 
+                                class="block mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                            💳 Pagar
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Função para pagar conta
+async function pagarConta(contaId, codigoBarras, valor) {
+    if (!confirm('Confirma o pagamento desta conta?')) {
+        return;
+    }
+    
+    try {
+        const response = await utils.request('/api/financeiro/api/pagar-conta', {
+            method: 'POST',
+            body: JSON.stringify({
+                codigoBarras: codigoBarras,
+                valor: valor,
+                descricao: 'Pagamento via sistema'
+            })
+        });
+        
+        if (response.success) {
+            utils.showNotification(response.data.message, 'success');
+            carregarContas(); // Recarregar lista
+            carregarDadosConta(); // Atualizar saldo
+        }
+    } catch (error) {
+        console.error('Erro ao pagar conta:', error);
+        utils.showNotification('Erro ao pagar conta', 'error');
+    }
+}
+
+// Função para filtrar contas
+function filtrarContas(status) {
+    carregarContas(status);
+}
+
+// Função para realizar transferência
+async function realizarTransferencia(event) {
+    event.preventDefault();
+    
+    try {
+        utils.showLoading();
+        
+        const formData = new FormData(event.target);
+        const dados = Object.fromEntries(formData.entries());
+        
+        const response = await utils.request('/api/financeiro/transferencia', {
+            method: 'POST',
+            body: JSON.stringify(dados)
+        });
+        
+        if (response.success) {
+            utils.showNotification('Transferência realizada com sucesso!', 'success');
+            
+            // Atualizar saldo na tela
+            document.getElementById('saldoAtual').textContent = 
+                `R$ ${response.novoSaldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Limpar formulário
+            limparFormTransferencia();
+            
+            // Recarregar extrato se estiver na aba
+            if (!document.getElementById('tab-extrato').classList.contains('hidden')) {
+                carregarExtrato();
+            }
+        }
+        
+    } catch (error) {
+        console.error('Erro na transferência:', error);
+        utils.showNotification(error.message || 'Erro ao realizar transferência', 'error');
+    } finally {
+        utils.hideLoading();
+    }
+}
+
+// Função para limpar formulário de transferência
+function limparFormTransferencia() {
+    document.getElementById('formTransferencia').reset();
+}
+
+// Função para abrir modal de pagamento
+function abrirModalPagamento(contaId) {
+    const conta = contasAtual.find(c => c.id === contaId);
+    if (!conta) return;
+    
+    document.getElementById('contaIdPagamento').value = contaId;
+    document.getElementById('descricaoPagamento').textContent = conta.descricao;
+    document.getElementById('valorOriginalPagamento').textContent = 
+        `R$ ${conta.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+    document.getElementById('valorPagamento').value = conta.valor.toFixed(2);
+    
+    document.getElementById('modalPagamento').classList.remove('hidden');
+}
+
+// Função para fechar modal de pagamento
+function fecharModalPagamento() {
+    document.getElementById('modalPagamento').classList.add('hidden');
+    document.getElementById('formPagamento').reset();
+}
+
+// Função para pagar conta
+async function pagarConta(event) {
+    event.preventDefault();
+    
+    try {
+        utils.showLoading();
+        
+        const contaId = document.getElementById('contaIdPagamento').value;
+        const valor = document.getElementById('valorPagamento').value;
+        
+        const response = await utils.request('/api/financeiro/pagar-conta', {
+            method: 'POST',
+            body: JSON.stringify({ contaId, valor })
+        });
+        
+        if (response.success) {
+            utils.showNotification('Conta paga com sucesso!', 'success');
+            
+            // Atualizar saldo na tela
+            document.getElementById('saldoAtual').textContent = 
+                `R$ ${response.novoSaldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Fechar modal
+            fecharModalPagamento();
+            
+            // Recarregar contas
+            const statusAtivo = document.querySelector('.filtro-conta.bg-blue-600').dataset.status;
+            carregarContas(statusAtivo);
+            
+            // Recarregar extrato se estiver na aba
+            if (!document.getElementById('tab-extrato').classList.contains('hidden')) {
+                carregarExtrato();
+            }
+        }
+        
+    } catch (error) {
+        console.error('Erro no pagamento:', error);
+        utils.showNotification(error.message || 'Erro ao pagar conta', 'error');
+    } finally {
+        utils.hideLoading();
+    }
+}
+
+// Função para exportar extrato (placeholder)
+function exportarExtrato() {
+    utils.showNotification('Funcionalidade de exportação em desenvolvimento', 'info');
+}
+
+// Função para adicionar conta (placeholder)
+function adicionarConta() {
+    utils.showNotification('Funcionalidade de adicionar conta em desenvolvimento', 'info');
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('modalPagamento').addEventListener('click', function(event) {
+    if (event.target === this) {
+        fecharModalPagamento();
+    }
+});
+</script>

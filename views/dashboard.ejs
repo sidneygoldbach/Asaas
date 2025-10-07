@@ -1,0 +1,431 @@
+<!-- Cards de resumo -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Receita Total -->
+    <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Total</p>
+                <p id="receitaTotal" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex items-center text-sm">
+                <span id="receitaTotalVariacao" class="text-green-600">+0%</span>
+                <span class="text-gray-500 ml-1">vs mês anterior</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Receita Recebida -->
+    <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-check-circle text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Recebida</p>
+                <p id="receitaRecebida" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex items-center text-sm">
+                <span id="taxaRecebimento" class="text-blue-600">0%</span>
+                <span class="text-gray-500 ml-1">da receita total</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Receita Pendente -->
+    <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Pendente</p>
+                <p id="receitaPendente" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex items-center text-sm">
+                <span id="cobrancasPendentes" class="text-yellow-600">0</span>
+                <span class="text-gray-500 ml-1">cobranças pendentes</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Taxa de Inadimplência -->
+    <div class="bg-white rounded-lg shadow-sm p-6 card-hover">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-100">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Taxa de Inadimplência</p>
+                <p id="taxaInadimplencia" class="text-2xl font-bold text-gray-900">0%</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex items-center text-sm">
+                <span id="valorVencido" class="text-red-600">R$ 0,00</span>
+                <span class="text-gray-500 ml-1">em atraso</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Gráfico de Receita -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Receita dos Últimos 6 Meses</h3>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-md">6M</button>
+                <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md">1A</button>
+            </div>
+        </div>
+        <div class="h-64">
+            <canvas id="receitaChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Gráfico de Status das Cobranças -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Status das Cobranças</h3>
+            <select id="periodoStatus" class="text-sm border border-gray-300 rounded-md px-3 py-1">
+                <option value="mes">Este Mês</option>
+                <option value="semana">Esta Semana</option>
+                <option value="ano">Este Ano</option>
+            </select>
+        </div>
+        <div class="h-64">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Tabelas de dados -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Próximos Vencimentos -->
+    <div class="bg-white rounded-lg shadow-sm">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Próximos Vencimentos</h3>
+                <span class="text-sm text-gray-500">Próximos 7 dias</span>
+            </div>
+        </div>
+        <div class="p-6">
+            <div id="proximosVencimentos" class="space-y-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="mt-4 text-center">
+                <a href="/cobrancas?status=PENDING" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    Ver todas as cobranças pendentes
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Maiores Inadimplentes -->
+    <div class="bg-white rounded-lg shadow-sm">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Maiores Inadimplentes</h3>
+                <span class="text-sm text-gray-500">Top 5</span>
+            </div>
+        </div>
+        <div class="p-6">
+            <div id="maioresInadimplentes" class="space-y-4">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+            <div class="mt-4 text-center">
+                <a href="/dashboard/inadimplencia" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                    Ver relatório completo de inadimplência
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts específicos da página -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let receitaChart, statusChart;
+    
+    // Carregar dados do dashboard
+    async function carregarDashboard() {
+        try {
+            utils.showLoading();
+            
+            const response = await utils.request('/api/dashboard');
+            const data = response.data;
+            
+            // Atualizar cards de resumo
+            atualizarResumoFinanceiro(data.resumoFinanceiro);
+            atualizarContadores(data.contadores);
+            
+            // Criar gráficos
+            criarGraficoReceita(data.receitaUltimos6Meses);
+            criarGraficoStatus(data.resumoPorStatus);
+            
+            // Carregar próximos vencimentos
+            await carregarProximosVencimentos();
+            
+            // Carregar maiores inadimplentes
+            await carregarMaioresInadimplentes();
+            
+        } catch (error) {
+            console.error('Erro ao carregar dashboard:', error);
+            utils.showToast('Erro ao carregar dados do dashboard', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Atualizar resumo financeiro
+    function atualizarResumoFinanceiro(resumo) {
+        document.getElementById('receitaTotal').textContent = utils.formatCurrency(resumo.receitaTotal);
+        document.getElementById('receitaRecebida').textContent = utils.formatCurrency(resumo.receitaRecebida);
+        document.getElementById('receitaPendente').textContent = utils.formatCurrency(resumo.receitaPendente);
+        document.getElementById('taxaInadimplencia').textContent = resumo.taxaInadimplencia + '%';
+        document.getElementById('valorVencido').textContent = utils.formatCurrency(resumo.receitaVencida);
+        
+        // Calcular taxa de recebimento
+        const taxaRecebimento = resumo.receitaTotal > 0 ? 
+            ((resumo.receitaRecebida / resumo.receitaTotal) * 100).toFixed(1) : 0;
+        document.getElementById('taxaRecebimento').textContent = taxaRecebimento + '%';
+    }
+    
+    // Atualizar contadores
+    function atualizarContadores(contadores) {
+        document.getElementById('cobrancasPendentes').textContent = contadores.cobrancasPendentes;
+    }
+    
+    // Criar gráfico de receita
+    function criarGraficoReceita(dados) {
+        const ctx = document.getElementById('receitaChart').getContext('2d');
+        
+        if (receitaChart) {
+            receitaChart.destroy();
+        }
+        
+        receitaChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dados.map(item => item.mesNome),
+                datasets: [{
+                    label: 'Receita Recebida',
+                    data: dados.map(item => item.receita),
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + value.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    }
+    
+    // Criar gráfico de status
+    function criarGraficoStatus(dados) {
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        
+        if (statusChart) {
+            statusChart.destroy();
+        }
+        
+        const labels = [];
+        const values = [];
+        const colors = [];
+        
+        Object.entries(dados).forEach(([status, info]) => {
+            if (info.count > 0) {
+                labels.push(utils.getStatusText(status));
+                values.push(info.value);
+                
+                switch (status) {
+                    case 'RECEIVED':
+                    case 'CONFIRMED':
+                        colors.push('rgb(34, 197, 94)');
+                        break;
+                    case 'PENDING':
+                        colors.push('rgb(234, 179, 8)');
+                        break;
+                    case 'OVERDUE':
+                        colors.push('rgb(239, 68, 68)');
+                        break;
+                    default:
+                        colors.push('rgb(156, 163, 175)');
+                }
+            }
+        });
+        
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Carregar próximos vencimentos
+    async function carregarProximosVencimentos() {
+        try {
+            const response = await utils.request('/api/dashboard/vencimentos?dias=7');
+            const vencimentos = response.data.vencimentosPorDia.slice(0, 5);
+            
+            const container = document.getElementById('proximosVencimentos');
+            
+            if (vencimentos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-check text-3xl mb-2"></i>
+                        <p>Nenhum vencimento nos próximos 7 dias</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = vencimentos.map(vencimento => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-medium text-gray-900">${utils.formatDate(vencimento.data)}</p>
+                        <p class="text-sm text-gray-500">${vencimento.quantidade} cobrança(s)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-900">${utils.formatCurrency(vencimento.valorTotal)}</p>
+                        <p class="text-xs text-gray-500">
+                            ${moment(vencimento.data).fromNow()}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('Erro ao carregar próximos vencimentos:', error);
+            document.getElementById('proximosVencimentos').innerHTML = `
+                <div class="text-center py-8 text-red-500">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                    <p>Erro ao carregar vencimentos</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Carregar maiores inadimplentes
+    async function carregarMaioresInadimplentes() {
+        try {
+            const response = await utils.request('/api/dashboard/inadimplencia');
+            const inadimplentes = response.data.top10Inadimplentes.slice(0, 5);
+            
+            const container = document.getElementById('maioresInadimplentes');
+            
+            if (inadimplentes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-check-circle text-3xl mb-2"></i>
+                        <p>Nenhum cliente inadimplente</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = inadimplentes.map(cliente => `
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div>
+                        <p class="font-medium text-gray-900">${cliente.customerName}</p>
+                        <p class="text-sm text-red-600">${cliente.cobrancas.length} cobrança(s) vencida(s)</p>
+                        <p class="text-xs text-gray-500">Maior atraso: ${cliente.maiorAtraso} dias</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-red-600">${utils.formatCurrency(cliente.valorTotal)}</p>
+                    </div>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('Erro ao carregar maiores inadimplentes:', error);
+            document.getElementById('maioresInadimplentes').innerHTML = `
+                <div class="text-center py-8 text-red-500">
+                    <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                    <p>Erro ao carregar inadimplentes</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Event listeners
+    document.getElementById('periodoStatus')?.addEventListener('change', function() {
+        // Recarregar gráfico de status com novo período
+        carregarDashboard();
+    });
+    
+    // Carregar dados iniciais - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        carregarDashboard();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                carregarDashboard();
+            }
+        }, 100);
+    }
+    
+    // Atualizar dados a cada 5 minutos
+    setInterval(() => {
+        if (typeof utils !== 'undefined') {
+            carregarDashboard();
+        }
+    }, 5 * 60 * 1000);
+});
+</script>

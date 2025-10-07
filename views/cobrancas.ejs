@@ -1,0 +1,964 @@
+<!-- Header da página -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Cobranças</h1>
+        <p class="text-gray-600">Gerencie as cobranças de aluguel e gere boletos</p>
+    </div>
+    <div class="flex space-x-3">
+        <button id="novaCobrancaBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-plus mr-2"></i>
+            Nova Cobrança
+        </button>
+        <button id="cobrancaRecorrenteBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-sync mr-2"></i>
+            Cobrança Recorrente
+        </button>
+    </div>
+</div>
+
+<!-- Cards de resumo -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-file-invoice text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Total de Cobranças</p>
+                <p id="totalCobrancas" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Pagas</p>
+                <p id="cobrancasPagas" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Pendentes</p>
+                <p id="cobrancasPendentes" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-100">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Vencidas</p>
+                <p id="cobrancasVencidas" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100">
+                <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Valor Total</p>
+                <p id="valorTotalCobrancas" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+            <div class="relative">
+                <input type="text" id="buscarCobranca" placeholder="Cliente, imóvel..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="PENDING">Pendente</option>
+                <option value="RECEIVED">Pago</option>
+                <option value="OVERDUE">Vencido</option>
+                <option value="CONFIRMED">Confirmado</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+            <select id="filtroPeriodo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="hoje">Hoje</option>
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mês</option>
+                <option value="vencidas">Vencidas</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data Inicial</label>
+            <input type="date" id="dataInicial" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data Final</label>
+            <input type="date" id="dataFinal" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <div class="flex items-end">
+            <button id="limparFiltros" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                <i class="fas fa-times mr-2"></i>
+                Limpar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de cobranças -->
+<div class="bg-white rounded-lg shadow-sm">
+    <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Lista de Cobranças</h2>
+            <div class="flex items-center space-x-4">
+                <span id="totalCobrancasLista" class="text-sm text-gray-500">0 cobranças encontradas</span>
+                <button id="exportarCobrancas" class="text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-download mr-1"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de cobranças -->
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cobrança</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imóvel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaCobrancas" class="bg-white divide-y divide-gray-200">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loadingCobrancas" class="hidden p-8 text-center">
+        <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+            <span class="text-gray-600">Carregando cobranças...</span>
+        </div>
+    </div>
+    
+    <!-- Empty state -->
+    <div id="emptyStateCobrancas" class="hidden p-8 text-center">
+        <i class="fas fa-file-invoice text-4xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhuma cobrança encontrada</h3>
+        <p class="text-gray-500 mb-4">Comece criando sua primeira cobrança de aluguel.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Criar Cobrança
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Cobrança -->
+<div id="modalCobranca" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="tituloModalCobranca" class="text-lg font-semibold text-gray-900">Nova Cobrança</h3>
+                <button id="fecharModalCobranca" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form id="formCobranca" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Informações básicas -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Informações da Cobrança</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cliente *</label>
+                    <select id="clienteCobranca" name="customer" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o cliente</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imóvel</label>
+                    <select id="imovelCobranca" name="imovelId"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o imóvel</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Data de Vencimento *</label>
+                    <input type="date" id="dataVencimentoCobranca" name="dueDate" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Forma de Pagamento *</label>
+                    <select id="formaPagamentoCobranca" name="billingType" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="BOLETO">Boleto Bancário</option>
+                        <option value="CREDIT_CARD">Cartão de Crédito</option>
+                        <option value="PIX">PIX</option>
+                        <option value="UNDEFINED">Indefinido</option>
+                    </select>
+                </div>
+                
+                <!-- Valores -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Valores</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Aluguel *</label>
+                    <input type="number" id="valorAluguelCobranca" name="valorAluguel" required min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Condomínio</label>
+                    <input type="number" id="valorCondominioCobranca" name="valorCondominio" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do IPTU</label>
+                    <input type="number" id="valorIptuCobranca" name="valorIptu" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Outros Valores</label>
+                    <input type="number" id="outrosValoresCobranca" name="outrosValores" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-900">Valor Total:</span>
+                            <span id="valorTotalCobranca" class="text-2xl font-bold text-blue-600">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configurações de cobrança -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Configurações de Cobrança</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Desconto (%)</label>
+                    <input type="number" id="descontoCobranca" name="discount.value" min="0" max="100" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dias para Desconto</label>
+                    <input type="number" id="diasDescontoCobranca" name="discount.dueDateLimitDays" min="0" max="30"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Juros por Atraso (% ao mês)</label>
+                    <input type="number" id="jurosCobranca" name="interest.value" min="0" max="20" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Multa por Atraso (%)</label>
+                    <input type="number" id="multaCobranca" name="fine.value" min="0" max="20" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Parcelamento -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Parcelamento</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Número de Parcelas</label>
+                    <select id="parcelasCobranca" name="installmentCount"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="1">À vista</option>
+                        <option value="2">2x</option>
+                        <option value="3">3x</option>
+                        <option value="6">6x</option>
+                        <option value="12">12x</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor da Parcela</label>
+                    <input type="number" id="valorParcelaCobranca" name="installmentValue" min="0" step="0.01" readonly
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50">
+                </div>
+                
+                <!-- Observações -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="descricaoCobranca" name="description" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Descrição da cobrança (ex: Aluguel referente ao mês de Janeiro/2024)"></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelarCobranca" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    <i class="fas fa-save mr-2"></i>
+                    Criar Cobrança
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Cobrança Recorrente -->
+<div id="modalCobrancaRecorrente" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Cobrança Recorrente</h3>
+                <button id="fecharModalRecorrente" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form id="formCobrancaRecorrente" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cliente *</label>
+                    <select id="clienteRecorrente" name="customer" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o cliente</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ciclo de Cobrança *</label>
+                    <select id="cicloRecorrente" name="cycle" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="MONTHLY">Mensal</option>
+                        <option value="QUARTERLY">Trimestral</option>
+                        <option value="SEMIANNUALLY">Semestral</option>
+                        <option value="YEARLY">Anual</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor *</label>
+                    <input type="number" id="valorRecorrente" name="value" required min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Próximo Vencimento *</label>
+                    <input type="date" id="proximoVencimentoRecorrente" name="nextDueDate" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
+                    <textarea id="descricaoRecorrente" name="description" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Descrição da cobrança recorrente"></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelarRecorrente" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                    <i class="fas fa-sync mr-2"></i>
+                    Criar Cobrança Recorrente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let cobrancas = [];
+    let clientes = [];
+    let imoveis = [];
+    
+    // Elementos do DOM
+    const modalCobranca = document.getElementById('modalCobranca');
+    const modalRecorrente = document.getElementById('modalCobrancaRecorrente');
+    const formCobranca = document.getElementById('formCobranca');
+    const formRecorrente = document.getElementById('formCobrancaRecorrente');
+    const corpoTabela = document.getElementById('corpoTabelaCobrancas');
+    const loadingCobrancas = document.getElementById('loadingCobrancas');
+    const emptyState = document.getElementById('emptyStateCobrancas');
+    
+    // Event listeners
+    document.getElementById('novaCobrancaBtn').addEventListener('click', () => abrirModalCobranca());
+    document.getElementById('cobrancaRecorrenteBtn').addEventListener('click', () => abrirModalRecorrente());
+    document.getElementById('fecharModalCobranca').addEventListener('click', fecharModalCobranca);
+    document.getElementById('fecharModalRecorrente').addEventListener('click', fecharModalRecorrente);
+    document.getElementById('cancelarCobranca').addEventListener('click', fecharModalCobranca);
+    document.getElementById('cancelarRecorrente').addEventListener('click', fecharModalRecorrente);
+    
+    document.getElementById('buscarCobranca').addEventListener('input', debounce(filtrarCobrancas, 300));
+    document.getElementById('filtroStatus').addEventListener('change', filtrarCobrancas);
+    document.getElementById('filtroPeriodo').addEventListener('change', filtrarCobrancas);
+    document.getElementById('dataInicial').addEventListener('change', filtrarCobrancas);
+    document.getElementById('dataFinal').addEventListener('change', filtrarCobrancas);
+    document.getElementById('limparFiltros').addEventListener('click', limparFiltros);
+    
+    formCobranca.addEventListener('submit', criarCobranca);
+    formRecorrente.addEventListener('submit', criarCobrancaRecorrente);
+    
+    // Calcular valor total automaticamente - aguardar utils
+    function adicionarEventListenersCalculo() {
+        ['valorAluguelCobranca', 'valorCondominioCobranca', 'valorIptuCobranca', 'outrosValoresCobranca'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcularValorTotal);
+        });
+        
+        document.getElementById('parcelasCobranca').addEventListener('change', calcularValorParcela);
+    }
+    
+    // Carregar dados iniciais
+    async function carregarDados() {
+        try {
+            mostrarLoading(true);
+            
+            const [cobrancasResponse, clientesResponse, imoveisResponse] = await Promise.all([
+                utils.request('/api/cobrancas'),
+                utils.request('/api/clientes'),
+                utils.request('/api/imoveis')
+            ]);
+            
+            cobrancas = cobrancasResponse.data || [];
+            clientes = clientesResponse.data || [];
+            imoveis = imoveisResponse.data || [];
+            
+            preencherSelects();
+            atualizarResumo();
+            renderizarCobrancas();
+            
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            utils.showToast('Erro ao carregar dados', 'error');
+            mostrarEmptyState(true);
+        } finally {
+            mostrarLoading(false);
+        }
+    }
+    
+    // Preencher selects
+    function preencherSelects() {
+        const selectsCliente = [
+            document.getElementById('clienteCobranca'),
+            document.getElementById('clienteRecorrente')
+        ];
+        
+        const selectImovel = document.getElementById('imovelCobranca');
+        
+        // Limpar selects
+        selectsCliente.forEach(select => {
+            select.innerHTML = '<option value="">Selecione o cliente</option>';
+        });
+        selectImovel.innerHTML = '<option value="">Selecione o imóvel</option>';
+        
+        // Preencher clientes
+        clientes.forEach(cliente => {
+            selectsCliente.forEach(select => {
+                const option = document.createElement('option');
+                option.value = cliente.id;
+                option.textContent = cliente.name;
+                select.appendChild(option);
+            });
+        });
+        
+        // Preencher imóveis
+        imoveis.forEach(imovel => {
+            const option = document.createElement('option');
+            option.value = imovel.id;
+            option.textContent = `${imovel.codigo} - ${imovel.endereco}`;
+            selectImovel.appendChild(option);
+        });
+    }
+    
+    // Atualizar resumo
+    function atualizarResumo() {
+        const total = cobrancas.length;
+        const pagas = cobrancas.filter(c => c.status === 'RECEIVED').length;
+        const pendentes = cobrancas.filter(c => c.status === 'PENDING').length;
+        const vencidas = cobrancas.filter(c => c.status === 'OVERDUE').length;
+        
+        const valorTotal = cobrancas.reduce((total, c) => total + (parseFloat(c.value) || 0), 0);
+        
+        document.getElementById('totalCobrancas').textContent = total;
+        document.getElementById('cobrancasPagas').textContent = pagas;
+        document.getElementById('cobrancasPendentes').textContent = pendentes;
+        document.getElementById('cobrancasVencidas').textContent = vencidas;
+        document.getElementById('valorTotalCobrancas').textContent = utils.formatCurrency(valorTotal);
+    }
+    
+    // Renderizar cobranças
+    function renderizarCobrancas() {
+        const cobrancasFiltradas = filtrarCobrancasArray();
+        
+        document.getElementById('totalCobrancasLista').textContent = `${cobrancasFiltradas.length} cobrança(s) encontrada(s)`;
+        
+        if (cobrancasFiltradas.length === 0) {
+            mostrarEmptyState(true);
+            return;
+        }
+        
+        mostrarEmptyState(false);
+        
+        corpoTabela.innerHTML = cobrancasFiltradas.map(cobranca => {
+            const cliente = clientes.find(c => c.id === cobranca.customer);
+            const imovel = imoveis.find(i => i.id === cobranca.imovelId);
+            
+            return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-invoice text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">#${cobranca.id}</div>
+                                <div class="text-sm text-gray-500">${cobranca.billingType}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${cliente?.name || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${cliente?.cpfCnpj || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${imovel?.codigo || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${imovel?.endereco || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${utils.formatDate(cobranca.dueDate)}</div>
+                        <div class="text-sm text-gray-500">${getDiasAtraso(cobranca.dueDate, cobranca.status)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${utils.formatCurrency(cobranca.value)}</div>
+                        <div class="text-sm text-gray-500">${cobranca.installmentCount > 1 ? `${cobranca.installmentCount}x` : 'À vista'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(cobranca.status)}">
+                            ${getStatusText(cobranca.status)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <button onclick="verCobranca('${cobranca.id}')" class="text-blue-600 hover:text-blue-900" title="Ver detalhes">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="baixarBoleto('${cobranca.id}')" class="text-green-600 hover:text-green-900" title="Baixar boleto">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button onclick="enviarCobranca('${cobranca.id}')" class="text-purple-600 hover:text-purple-900" title="Enviar por email">
+                                <i class="fas fa-envelope"></i>
+                            </button>
+                            <button onclick="excluirCobranca('${cobranca.id}')" class="text-red-600 hover:text-red-900" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // Filtrar cobranças
+    function filtrarCobrancasArray() {
+        const busca = document.getElementById('buscarCobranca').value.toLowerCase();
+        const status = document.getElementById('filtroStatus').value;
+        const periodo = document.getElementById('filtroPeriodo').value;
+        const dataInicial = document.getElementById('dataInicial').value;
+        const dataFinal = document.getElementById('dataFinal').value;
+        
+        return cobrancas.filter(cobranca => {
+            const cliente = clientes.find(c => c.id === cobranca.customer);
+            const imovel = imoveis.find(i => i.id === cobranca.imovelId);
+            
+            const matchBusca = !busca || 
+                (cliente?.name || '').toLowerCase().includes(busca) ||
+                (imovel?.codigo || '').toLowerCase().includes(busca) ||
+                cobranca.id.toString().includes(busca);
+            
+            const matchStatus = !status || cobranca.status === status;
+            
+            let matchPeriodo = true;
+            if (periodo) {
+                const hoje = new Date();
+                const vencimento = new Date(cobranca.dueDate);
+                
+                switch (periodo) {
+                    case 'hoje':
+                        matchPeriodo = vencimento.toDateString() === hoje.toDateString();
+                        break;
+                    case 'semana':
+                        const inicioSemana = new Date(hoje);
+                        inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+                        const fimSemana = new Date(inicioSemana);
+                        fimSemana.setDate(inicioSemana.getDate() + 6);
+                        matchPeriodo = vencimento >= inicioSemana && vencimento <= fimSemana;
+                        break;
+                    case 'mes':
+                        matchPeriodo = vencimento.getMonth() === hoje.getMonth() && 
+                                     vencimento.getFullYear() === hoje.getFullYear();
+                        break;
+                    case 'vencidas':
+                        matchPeriodo = vencimento < hoje && cobranca.status !== 'RECEIVED';
+                        break;
+                }
+            }
+            
+            let matchData = true;
+            if (dataInicial && dataFinal) {
+                const vencimento = new Date(cobranca.dueDate);
+                const inicio = new Date(dataInicial);
+                const fim = new Date(dataFinal);
+                matchData = vencimento >= inicio && vencimento <= fim;
+            }
+            
+            return matchBusca && matchStatus && matchPeriodo && matchData;
+        });
+    }
+    
+    function filtrarCobrancas() {
+        renderizarCobrancas();
+    }
+    
+    function limparFiltros() {
+        document.getElementById('buscarCobranca').value = '';
+        document.getElementById('filtroStatus').value = '';
+        document.getElementById('filtroPeriodo').value = '';
+        document.getElementById('dataInicial').value = '';
+        document.getElementById('dataFinal').value = '';
+        filtrarCobrancas();
+    }
+    
+    // Modais
+    function abrirModalCobranca() {
+        formCobranca.reset();
+        // Definir data de vencimento padrão (próximo mês, dia 10)
+        const proximoMes = new Date();
+        proximoMes.setMonth(proximoMes.getMonth() + 1);
+        proximoMes.setDate(10);
+        document.getElementById('dataVencimentoCobranca').value = proximoMes.toISOString().split('T')[0];
+        
+        // Valores padrão
+        document.getElementById('jurosCobranca').value = '1';
+        document.getElementById('multaCobranca').value = '2';
+        document.getElementById('diasDescontoCobranca').value = '5';
+        document.getElementById('descontoCobranca').value = '5';
+        
+        // Aguardar utils estar disponível antes de calcular
+        if (typeof utils !== 'undefined') {
+            calcularValorTotal();
+        } else {
+            // Aguardar utils e tentar novamente
+            const checkUtils = setInterval(() => {
+                if (typeof utils !== 'undefined') {
+                    clearInterval(checkUtils);
+                    calcularValorTotal();
+                }
+            }, 50);
+        }
+        
+        modalCobranca.classList.remove('hidden');
+    }
+    
+    function fecharModalCobranca() {
+        modalCobranca.classList.add('hidden');
+    }
+    
+    function abrirModalRecorrente() {
+        formRecorrente.reset();
+        // Definir próximo vencimento padrão
+        const proximoMes = new Date();
+        proximoMes.setMonth(proximoMes.getMonth() + 1);
+        proximoMes.setDate(10);
+        document.getElementById('proximoVencimentoRecorrente').value = proximoMes.toISOString().split('T')[0];
+        
+        modalRecorrente.classList.remove('hidden');
+    }
+    
+    function fecharModalRecorrente() {
+        modalRecorrente.classList.add('hidden');
+    }
+    
+    // Calcular valores
+    function calcularValorTotal() {
+        // Verificar se utils está disponível
+        if (typeof utils === 'undefined') {
+            console.warn('Utils não está disponível ainda, aguardando...');
+            return;
+        }
+        
+        const aluguel = parseFloat(document.getElementById('valorAluguelCobranca').value) || 0;
+        const condominio = parseFloat(document.getElementById('valorCondominioCobranca').value) || 0;
+        const iptu = parseFloat(document.getElementById('valorIptuCobranca').value) || 0;
+        const outros = parseFloat(document.getElementById('outrosValoresCobranca').value) || 0;
+        
+        const total = aluguel + condominio + iptu + outros;
+        document.getElementById('valorTotalCobranca').textContent = utils.formatCurrency(total);
+        
+        calcularValorParcela();
+    }
+    
+    function calcularValorParcela() {
+        const total = parseFloat(document.getElementById('valorTotalCobranca').textContent.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        const parcelas = parseInt(document.getElementById('parcelasCobranca').value) || 1;
+        
+        const valorParcela = total / parcelas;
+        document.getElementById('valorParcelaCobranca').value = valorParcela.toFixed(2);
+    }
+    
+    // Criar cobrança
+    async function criarCobranca(e) {
+        e.preventDefault();
+        
+        try {
+            utils.showLoading();
+            
+            const formData = new FormData(formCobranca);
+            const dadosCobranca = Object.fromEntries(formData.entries());
+            
+            // Calcular valor total
+            const valorTotal = (parseFloat(dadosCobranca.valorAluguel) || 0) +
+                             (parseFloat(dadosCobranca.valorCondominio) || 0) +
+                             (parseFloat(dadosCobranca.valorIptu) || 0) +
+                             (parseFloat(dadosCobranca.outrosValores) || 0);
+            
+            dadosCobranca.value = valorTotal;
+            
+            const response = await utils.request('/api/cobrancas', {
+                method: 'POST',
+                body: JSON.stringify(dadosCobranca)
+            });
+            
+            utils.showToast('Cobrança criada com sucesso!', 'success');
+            fecharModalCobranca();
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao criar cobrança:', error);
+            utils.showToast(error.message || 'Erro ao criar cobrança', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Criar cobrança recorrente
+    async function criarCobrancaRecorrente(e) {
+        e.preventDefault();
+        
+        try {
+            utils.showLoading();
+            
+            const formData = new FormData(formRecorrente);
+            const dadosRecorrente = Object.fromEntries(formData.entries());
+            
+            const response = await utils.request('/api/cobrancas/recorrente', {
+                method: 'POST',
+                body: JSON.stringify(dadosRecorrente)
+            });
+            
+            utils.showToast('Cobrança recorrente criada com sucesso!', 'success');
+            fecharModalRecorrente();
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao criar cobrança recorrente:', error);
+            utils.showToast(error.message || 'Erro ao criar cobrança recorrente', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Funções globais
+    window.verCobranca = function(id) {
+        utils.showToast('Funcionalidade em desenvolvimento', 'info');
+    };
+    
+    window.baixarBoleto = async function(id) {
+        try {
+            utils.showLoading();
+            
+            const response = await utils.request(`/cobrancas/${id}/boleto`);
+            
+            if (response.data.bankSlipUrl) {
+                window.open(response.data.bankSlipUrl, '_blank');
+            } else {
+                utils.showToast('Boleto não disponível', 'warning');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao baixar boleto:', error);
+            utils.showToast('Erro ao baixar boleto', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    window.enviarCobranca = async function(id) {
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/cobrancas/${id}/enviar`, {
+                method: 'POST'
+            });
+            
+            utils.showToast('Cobrança enviada por email!', 'success');
+            
+        } catch (error) {
+            console.error('Erro ao enviar cobrança:', error);
+            utils.showToast('Erro ao enviar cobrança', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    window.excluirCobranca = async function(id) {
+        if (!confirm('Tem certeza que deseja excluir esta cobrança?')) {
+            return;
+        }
+        
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/cobrancas/${id}`, {
+                method: 'DELETE'
+            });
+            
+            utils.showToast('Cobrança excluída com sucesso!', 'success');
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao excluir cobrança:', error);
+            utils.showToast('Erro ao excluir cobrança', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    // Utilitários
+    function getStatusClass(status) {
+        const classes = {
+            'PENDING': 'bg-yellow-100 text-yellow-800',
+            'RECEIVED': 'bg-green-100 text-green-800',
+            'OVERDUE': 'bg-red-100 text-red-800',
+            'CONFIRMED': 'bg-blue-100 text-blue-800'
+        };
+        return classes[status] || 'bg-gray-100 text-gray-800';
+    }
+    
+    function getStatusText(status) {
+        const texts = {
+            'PENDING': 'Pendente',
+            'RECEIVED': 'Pago',
+            'OVERDUE': 'Vencido',
+            'CONFIRMED': 'Confirmado'
+        };
+        return texts[status] || status;
+    }
+    
+    function getDiasAtraso(dueDate, status) {
+        if (status === 'RECEIVED') return '';
+        
+        const hoje = new Date();
+        const vencimento = new Date(dueDate);
+        const diffTime = hoje - vencimento;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 0) {
+            return `${diffDays} dia(s) em atraso`;
+        } else if (diffDays === 0) {
+            return 'Vence hoje';
+        } else {
+            return `${Math.abs(diffDays)} dia(s) para vencer`;
+        }
+    }
+    
+    function mostrarLoading(show) {
+        loadingCobrancas.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function mostrarEmptyState(show) {
+        emptyState.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Inicializar - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        adicionarEventListenersCalculo();
+        carregarDados();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                adicionarEventListenersCalculo();
+                carregarDados();
+            }
+        }, 100);
+    }
+});
+</script>

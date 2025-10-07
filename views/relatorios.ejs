@@ -1,0 +1,640 @@
+<!-- Header da página -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Relatórios</h1>
+        <p class="text-gray-600">Análises e relatórios financeiros do sistema</p>
+    </div>
+    <div class="flex space-x-3">
+        <button id="exportarRelatorio" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-download mr-2"></i>
+            Exportar PDF
+        </button>
+        <button id="agendarRelatorio" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-calendar mr-2"></i>
+            Agendar Envio
+        </button>
+    </div>
+</div>
+
+<!-- Filtros de período -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Período</label>
+            <select id="filtroPeriodo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="mes">Este mês</option>
+                <option value="trimestre">Este trimestre</option>
+                <option value="semestre">Este semestre</option>
+                <option value="ano">Este ano</option>
+                <option value="personalizado">Período personalizado</option>
+            </select>
+        </div>
+        
+        <div id="dataInicialContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data Inicial</label>
+            <input type="date" id="dataInicial" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <div id="dataFinalContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data Final</label>
+            <input type="date" id="dataFinal" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <div class="flex items-end">
+            <button id="atualizarRelatorio" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-sync mr-2"></i>
+                Atualizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cards de resumo financeiro -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Total</p>
+                <p id="receitaTotal" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="variacaoReceita" class="text-sm text-green-600">+0% vs período anterior</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-check-circle text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Recebido</p>
+                <p id="valorRecebido" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="percentualRecebido" class="text-sm text-blue-600">0% do total</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Pendente</p>
+                <p id="valorPendente" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="percentualPendente" class="text-sm text-yellow-600">0% do total</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-100">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Inadimplência</p>
+                <p id="valorInadimplencia" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+                <p id="taxaInadimplencia" class="text-sm text-red-600">0% do total</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Gráfico de receita mensal -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Evolução da Receita</h3>
+            <div class="flex space-x-2">
+                <button id="tipoGraficoReceita" data-tipo="line" class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded">Linha</button>
+                <button data-tipo="bar" class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">Barras</button>
+            </div>
+        </div>
+        <div class="h-80">
+            <canvas id="graficoReceita"></canvas>
+        </div>
+    </div>
+    
+    <!-- Gráfico de status das cobranças -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Status das Cobranças</h3>
+        </div>
+        <div class="h-80">
+            <canvas id="graficoStatus"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Análise de inadimplência -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Top inadimplentes -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Maiores Inadimplentes</h3>
+        <div id="topInadimplentes" class="space-y-4">
+            <!-- Será preenchido via JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Análise por faixa de atraso -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Análise por Faixa de Atraso</h3>
+        <div class="h-80">
+            <canvas id="graficoAtraso"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Relatório de imóveis -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Desempenho por Imóvel</h3>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imóvel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inquilino</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receita</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recebido</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pendente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taxa Pagamento</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaImoveis" class="bg-white divide-y divide-gray-200">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Métricas de performance -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h4 class="text-md font-semibold text-gray-900 mb-4">Tempo Médio de Recebimento</h4>
+        <div class="text-center">
+            <div id="tempoMedioRecebimento" class="text-3xl font-bold text-blue-600">0</div>
+            <div class="text-sm text-gray-500">dias</div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h4 class="text-md font-semibold text-gray-900 mb-4">Taxa de Ocupação</h4>
+        <div class="text-center">
+            <div id="taxaOcupacao" class="text-3xl font-bold text-green-600">0%</div>
+            <div class="text-sm text-gray-500">imóveis ocupados</div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <h4 class="text-md font-semibold text-gray-900 mb-4">Ticket Médio</h4>
+        <div class="text-center">
+            <div id="ticketMedio" class="text-3xl font-bold text-purple-600">R$ 0</div>
+            <div class="text-sm text-gray-500">por cobrança</div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let dadosRelatorio = {};
+    let graficoReceita, graficoStatus, graficoAtraso;
+    
+    // Elementos do DOM
+    const filtroPeriodo = document.getElementById('filtroPeriodo');
+    const dataInicialContainer = document.getElementById('dataInicialContainer');
+    const dataFinalContainer = document.getElementById('dataFinalContainer');
+    const dataInicial = document.getElementById('dataInicial');
+    const dataFinal = document.getElementById('dataFinal');
+    
+    // Event listeners
+    filtroPeriodo.addEventListener('change', function() {
+        const isPersonalizado = this.value === 'personalizado';
+        dataInicialContainer.classList.toggle('hidden', !isPersonalizado);
+        dataFinalContainer.classList.toggle('hidden', !isPersonalizado);
+        
+        if (!isPersonalizado) {
+            carregarRelatorio();
+        }
+    });
+    
+    document.getElementById('atualizarRelatorio').addEventListener('click', carregarRelatorio);
+    document.getElementById('exportarRelatorio').addEventListener('click', exportarRelatorio);
+    
+    // Botões de tipo de gráfico
+    document.querySelectorAll('[data-tipo]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tipo = this.dataset.tipo;
+            const container = this.parentElement;
+            
+            // Atualizar botões ativos
+            container.querySelectorAll('button').forEach(b => {
+                b.className = 'px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded';
+            });
+            this.className = 'px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded';
+            
+            // Atualizar gráfico
+            if (graficoReceita) {
+                graficoReceita.config.type = tipo;
+                graficoReceita.update();
+            }
+        });
+    });
+    
+    // Carregar relatório
+    async function carregarRelatorio() {
+        try {
+            utils.showLoading();
+            
+            const periodo = filtroPeriodo.value;
+            let params = { periodo };
+            
+            if (periodo === 'personalizado') {
+                if (!dataInicial.value || !dataFinal.value) {
+                    utils.showToast('Selecione as datas inicial e final', 'warning');
+                    return;
+                }
+                params.dataInicial = dataInicial.value;
+                params.dataFinal = dataFinal.value;
+            }
+            
+            const queryString = new URLSearchParams(params).toString();
+            const response = await utils.request(`/dashboard/receita?${queryString}`);
+            
+            dadosRelatorio = response.data;
+            
+            atualizarResumo();
+            criarGraficos();
+            atualizarTabelaImoveis();
+            atualizarMetricas();
+            
+        } catch (error) {
+            console.error('Erro ao carregar relatório:', error);
+            utils.showToast('Erro ao carregar relatório', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Atualizar resumo
+    function atualizarResumo() {
+        const { resumo } = dadosRelatorio;
+        
+        document.getElementById('receitaTotal').textContent = utils.formatCurrency(resumo.total);
+        document.getElementById('valorRecebido').textContent = utils.formatCurrency(resumo.recebido);
+        document.getElementById('valorPendente').textContent = utils.formatCurrency(resumo.pendente);
+        document.getElementById('valorInadimplencia').textContent = utils.formatCurrency(resumo.vencido);
+        
+        // Calcular percentuais
+        const percentualRecebido = resumo.total > 0 ? (resumo.recebido / resumo.total * 100) : 0;
+        const percentualPendente = resumo.total > 0 ? (resumo.pendente / resumo.total * 100) : 0;
+        const taxaInadimplencia = resumo.total > 0 ? (resumo.vencido / resumo.total * 100) : 0;
+        
+        document.getElementById('percentualRecebido').textContent = `${percentualRecebido.toFixed(1)}% do total`;
+        document.getElementById('percentualPendente').textContent = `${percentualPendente.toFixed(1)}% do total`;
+        document.getElementById('taxaInadimplencia').textContent = `${taxaInadimplencia.toFixed(1)}% do total`;
+        
+        // Variação (simulada - em um sistema real, viria do backend)
+        const variacao = Math.random() * 20 - 10; // -10% a +10%
+        const variacaoElement = document.getElementById('variacaoReceita');
+        variacaoElement.textContent = `${variacao >= 0 ? '+' : ''}${variacao.toFixed(1)}% vs período anterior`;
+        variacaoElement.className = `text-sm ${variacao >= 0 ? 'text-green-600' : 'text-red-600'}`;
+    }
+    
+    // Criar gráficos
+    function criarGraficos() {
+        criarGraficoReceita();
+        criarGraficoStatus();
+        criarGraficoAtraso();
+    }
+    
+    function criarGraficoReceita() {
+        const ctx = document.getElementById('graficoReceita').getContext('2d');
+        
+        if (graficoReceita) {
+            graficoReceita.destroy();
+        }
+        
+        const { evolucao } = dadosRelatorio;
+        
+        graficoReceita = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: evolucao.map(item => utils.formatDate(item.data)),
+                datasets: [{
+                    label: 'Receita Total',
+                    data: evolucao.map(item => item.total),
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Recebido',
+                    data: evolucao.map(item => item.recebido),
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return utils.formatCurrency(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + utils.formatCurrency(context.parsed.y);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function criarGraficoStatus() {
+        const ctx = document.getElementById('graficoStatus').getContext('2d');
+        
+        if (graficoStatus) {
+            graficoStatus.destroy();
+        }
+        
+        const { resumo } = dadosRelatorio;
+        
+        graficoStatus = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Recebido', 'Pendente', 'Vencido'],
+                datasets: [{
+                    data: [resumo.recebido, resumo.pendente, resumo.vencido],
+                    backgroundColor: [
+                        'rgb(34, 197, 94)',
+                        'rgb(251, 191, 36)',
+                        'rgb(239, 68, 68)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + utils.formatCurrency(context.parsed) + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function criarGraficoAtraso() {
+        const ctx = document.getElementById('graficoAtraso').getContext('2d');
+        
+        if (graficoAtraso) {
+            graficoAtraso.destroy();
+        }
+        
+        // Dados simulados de faixas de atraso
+        const faixasAtraso = [
+            { faixa: '1-7 dias', valor: Math.random() * 5000 },
+            { faixa: '8-15 dias', valor: Math.random() * 3000 },
+            { faixa: '16-30 dias', valor: Math.random() * 2000 },
+            { faixa: '31-60 dias', valor: Math.random() * 1500 },
+            { faixa: '60+ dias', valor: Math.random() * 1000 }
+        ];
+        
+        graficoAtraso = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: faixasAtraso.map(item => item.faixa),
+                datasets: [{
+                    label: 'Valor em Atraso',
+                    data: faixasAtraso.map(item => item.valor),
+                    backgroundColor: [
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(220, 38, 38, 0.8)',
+                        'rgba(185, 28, 28, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return utils.formatCurrency(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Valor: ' + utils.formatCurrency(context.parsed.y);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Atualizar tabela de imóveis
+    function atualizarTabelaImoveis() {
+        const tabelaImoveis = document.getElementById('tabelaImoveis');
+        
+        // Dados simulados de desempenho por imóvel
+        const imoveisData = [
+            {
+                codigo: 'APT001',
+                endereco: 'Rua das Flores, 123',
+                inquilino: 'João Silva',
+                receita: 2500,
+                recebido: 2500,
+                pendente: 0,
+                taxaPagamento: 100
+            },
+            {
+                codigo: 'APT002',
+                endereco: 'Av. Principal, 456',
+                inquilino: 'Maria Santos',
+                receita: 3200,
+                recebido: 1600,
+                pendente: 1600,
+                taxaPagamento: 50
+            },
+            {
+                codigo: 'CASA001',
+                endereco: 'Rua do Sol, 789',
+                inquilino: 'Pedro Costa',
+                receita: 4500,
+                recebido: 4500,
+                pendente: 0,
+                taxaPagamento: 100
+            }
+        ];
+        
+        tabelaImoveis.innerHTML = imoveisData.map(imovel => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${imovel.codigo}</div>
+                    <div class="text-sm text-gray-500">${imovel.endereco}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${imovel.inquilino}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${utils.formatCurrency(imovel.receita)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-green-600">${utils.formatCurrency(imovel.recebido)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm ${imovel.pendente > 0 ? 'text-red-600' : 'text-gray-500'}">${utils.formatCurrency(imovel.pendente)}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                            <div class="bg-${imovel.taxaPagamento === 100 ? 'green' : imovel.taxaPagamento >= 70 ? 'yellow' : 'red'}-600 h-2 rounded-full" 
+                                 style="width: ${imovel.taxaPagamento}%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${imovel.taxaPagamento}%</span>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    // Atualizar métricas
+    function atualizarMetricas() {
+        // Dados simulados
+        document.getElementById('tempoMedioRecebimento').textContent = Math.floor(Math.random() * 10 + 5);
+        document.getElementById('taxaOcupacao').textContent = Math.floor(Math.random() * 20 + 80) + '%';
+        
+        const ticketMedio = dadosRelatorio.resumo.total / Math.max(1, dadosRelatorio.evolucao.length);
+        document.getElementById('ticketMedio').textContent = utils.formatCurrency(ticketMedio);
+        
+        // Top inadimplentes
+        const topInadimplentes = document.getElementById('topInadimplentes');
+        const inadimplentes = [
+            { nome: 'Carlos Oliveira', valor: 4500, dias: 45 },
+            { nome: 'Ana Rodrigues', valor: 3200, dias: 30 },
+            { nome: 'Roberto Lima', valor: 2800, dias: 15 },
+            { nome: 'Fernanda Costa', valor: 2100, dias: 8 }
+        ];
+        
+        topInadimplentes.innerHTML = inadimplentes.map((cliente, index) => `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                        <span class="text-sm font-medium text-red-600">${index + 1}</span>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">${cliente.nome}</div>
+                        <div class="text-xs text-gray-500">${cliente.dias} dias em atraso</div>
+                    </div>
+                </div>
+                <div class="text-sm font-medium text-red-600">${utils.formatCurrency(cliente.valor)}</div>
+            </div>
+        `).join('');
+    }
+    
+    // Exportar relatório
+    async function exportarRelatorio() {
+        try {
+            utils.showLoading();
+            
+            const periodo = filtroPeriodo.value;
+            let params = { periodo, formato: 'pdf' };
+            
+            if (periodo === 'personalizado') {
+                params.dataInicial = dataInicial.value;
+                params.dataFinal = dataFinal.value;
+            }
+            
+            const queryString = new URLSearchParams(params).toString();
+            const response = await fetch(`/relatorios/financeiro?${queryString}`);
+            
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `relatorio-financeiro-${new Date().toISOString().split('T')[0]}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                utils.showToast('Relatório exportado com sucesso!', 'success');
+            } else {
+                throw new Error('Erro ao exportar relatório');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao exportar relatório:', error);
+            utils.showToast('Erro ao exportar relatório', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Definir período padrão (mês atual)
+    function definirPeriodoPadrao() {
+        const hoje = new Date();
+        const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+        
+        dataInicial.value = primeiroDia.toISOString().split('T')[0];
+        dataFinal.value = ultimoDia.toISOString().split('T')[0];
+    }
+    
+    // Inicializar - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        definirPeriodoPadrao();
+        carregarRelatorio();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                definirPeriodoPadrao();
+                carregarRelatorio();
+            }
+        }, 100);
+    }
+});
+</script>

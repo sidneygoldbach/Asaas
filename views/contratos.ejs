@@ -1,0 +1,815 @@
+<!-- Header da página -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Contratos</h1>
+        <p class="text-gray-600">Gerencie os contratos de locação dos seus imóveis</p>
+    </div>
+    <button id="novoContratoBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Novo Contrato
+    </button>
+</div>
+
+<!-- Cards de resumo -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-file-contract text-blue-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Total de Contratos</p>
+                <p id="totalContratos" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Contratos Ativos</p>
+                <p id="contratosAtivos" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-exclamation-triangle text-yellow-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Vencendo em 30 dias</p>
+                <p id="contratosVencendo" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100">
+                <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-500">Receita Mensal</p>
+                <p id="receitaMensalContratos" class="text-2xl font-bold text-gray-900">R$ 0,00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros e busca -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+            <div class="relative">
+                <input type="text" id="buscarContrato" placeholder="Inquilino, imóvel..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="ativo">Ativo</option>
+                <option value="encerrado">Encerrado</option>
+                <option value="vencido">Vencido</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Vencimento</label>
+            <select id="filtroVencimento" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="30">Próximos 30 dias</option>
+                <option value="60">Próximos 60 dias</option>
+                <option value="90">Próximos 90 dias</option>
+                <option value="vencidos">Já vencidos</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
+            <select id="filtroValor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="0-1000">Até R$ 1.000</option>
+                <option value="1000-2000">R$ 1.000 - R$ 2.000</option>
+                <option value="2000-5000">R$ 2.000 - R$ 5.000</option>
+                <option value="5000+">Acima de R$ 5.000</option>
+            </select>
+        </div>
+        
+        <div class="flex items-end">
+            <button id="limparFiltros" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                <i class="fas fa-times mr-2"></i>
+                Limpar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de contratos -->
+<div class="bg-white rounded-lg shadow-sm">
+    <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Lista de Contratos</h2>
+            <span id="totalContratosLista" class="text-sm text-gray-500">0 contratos encontrados</span>
+        </div>
+    </div>
+    
+    <!-- Tabela de contratos -->
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contrato</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inquilino</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imóvel</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaContratos" class="bg-white divide-y divide-gray-200">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loadingContratos" class="hidden p-8 text-center">
+        <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+            <span class="text-gray-600">Carregando contratos...</span>
+        </div>
+    </div>
+    
+    <!-- Empty state -->
+    <div id="emptyStateContratos" class="hidden p-8 text-center">
+        <i class="fas fa-file-contract text-4xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum contrato encontrado</h3>
+        <p class="text-gray-500 mb-4">Comece criando seu primeiro contrato de locação.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Criar Contrato
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Contrato -->
+<div id="modalContrato" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="tituloModalContrato" class="text-lg font-semibold text-gray-900">Novo Contrato</h3>
+                <button id="fecharModalContrato" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form id="formContrato" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Informações básicas -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Informações do Contrato</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Número do Contrato *</label>
+                    <input type="text" id="numeroContrato" name="numero" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Ex: CONT001">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Imóvel *</label>
+                    <select id="imovelContrato" name="imovelId" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o imóvel</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Inquilino *</label>
+                    <select id="inquilinoContrato" name="inquilinoId" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o inquilino</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fiador</label>
+                    <select id="fiadorContrato" name="fiadorId"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o fiador (opcional)</option>
+                    </select>
+                </div>
+                
+                <!-- Período do contrato -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Período do Contrato</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Data de Início *</label>
+                    <input type="date" id="dataInicioContrato" name="dataInicio" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Data de Fim *</label>
+                    <input type="date" id="dataFimContrato" name="dataFim" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dia de Vencimento *</label>
+                    <select id="diaVencimentoContrato" name="diaVencimento" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Selecione o dia</option>
+                        <option value="1">Dia 1</option>
+                        <option value="5">Dia 5</option>
+                        <option value="10">Dia 10</option>
+                        <option value="15">Dia 15</option>
+                        <option value="20">Dia 20</option>
+                        <option value="25">Dia 25</option>
+                        <option value="30">Dia 30</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reajuste Anual</label>
+                    <select id="reajusteContrato" name="reajuste"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="igpm">IGP-M</option>
+                        <option value="ipca">IPCA</option>
+                        <option value="inpc">INPC</option>
+                        <option value="fixo">Percentual Fixo</option>
+                        <option value="sem">Sem Reajuste</option>
+                    </select>
+                </div>
+                
+                <!-- Valores -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Valores</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Aluguel *</label>
+                    <input type="number" id="valorAluguelContrato" name="valorAluguel" required min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do Condomínio</label>
+                    <input type="number" id="valorCondominioContrato" name="valorCondominio" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Valor do IPTU</label>
+                    <input type="number" id="valorIptuContrato" name="valorIptu" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Outros Valores</label>
+                    <input type="number" id="outrosValoresContrato" name="outrosValores" min="0" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Configurações de cobrança -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Configurações de Cobrança</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Desconto (%)</label>
+                    <input type="number" id="descontoContrato" name="desconto" min="0" max="100" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Juros por Atraso (% ao mês)</label>
+                    <input type="number" id="jurosContrato" name="juros" min="0" max="20" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Multa por Atraso (%)</label>
+                    <input type="number" id="multaContrato" name="multa" min="0" max="20" step="0.01"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dias para Desconto</label>
+                    <input type="number" id="diasDescontoContrato" name="diasDesconto" min="0" max="30"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Observações -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Observações</label>
+                    <textarea id="observacoesContrato" name="observacoes" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Informações adicionais sobre o contrato..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelarContrato" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar Contrato
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let contratos = [];
+    let contratoEditando = null;
+    let imoveis = [];
+    let clientes = [];
+    
+    // Elementos do DOM
+    const modalContrato = document.getElementById('modalContrato');
+    const formContrato = document.getElementById('formContrato');
+    const tituloModal = document.getElementById('tituloModalContrato');
+    const corpoTabela = document.getElementById('corpoTabelaContratos');
+    const loadingContratos = document.getElementById('loadingContratos');
+    const emptyState = document.getElementById('emptyStateContratos');
+    
+    // Event listeners
+    document.getElementById('novoContratoBtn').addEventListener('click', () => abrirModalContrato());
+    document.getElementById('fecharModalContrato').addEventListener('click', fecharModalContrato);
+    document.getElementById('cancelarContrato').addEventListener('click', fecharModalContrato);
+    document.getElementById('buscarContrato').addEventListener('input', debounce(filtrarContratos, 300));
+    document.getElementById('filtroStatus').addEventListener('change', filtrarContratos);
+    document.getElementById('filtroVencimento').addEventListener('change', filtrarContratos);
+    document.getElementById('filtroValor').addEventListener('change', filtrarContratos);
+    document.getElementById('limparFiltros').addEventListener('click', limparFiltros);
+    
+    formContrato.addEventListener('submit', salvarContrato);
+    
+    // Carregar dados iniciais
+    async function carregarDados() {
+        try {
+            mostrarLoading(true);
+            
+            // Carregar contratos, imóveis e clientes em paralelo
+            const [contratosResponse, imoveisResponse, clientesResponse] = await Promise.all([
+                utils.request('/api/contratos'),
+                utils.request('/api/imoveis'),
+                utils.request('/api/clientes')
+            ]);
+            
+            contratos = contratosResponse.data || [];
+            imoveis = imoveisResponse.data || [];
+            clientes = clientesResponse.data || [];
+            
+            preencherSelects();
+            atualizarResumo();
+            renderizarContratos();
+            
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            utils.showToast('Erro ao carregar dados', 'error');
+            mostrarEmptyState(true);
+        } finally {
+            mostrarLoading(false);
+        }
+    }
+    
+    // Preencher selects
+    function preencherSelects() {
+        const selectImovel = document.getElementById('imovelContrato');
+        const selectInquilino = document.getElementById('inquilinoContrato');
+        const selectFiador = document.getElementById('fiadorContrato');
+        
+        // Limpar selects
+        selectImovel.innerHTML = '<option value="">Selecione o imóvel</option>';
+        selectInquilino.innerHTML = '<option value="">Selecione o inquilino</option>';
+        selectFiador.innerHTML = '<option value="">Selecione o fiador (opcional)</option>';
+        
+        // Preencher imóveis disponíveis
+        imoveis.filter(i => i.status === 'disponivel').forEach(imovel => {
+            const option = document.createElement('option');
+            option.value = imovel.id;
+            option.textContent = `${imovel.codigo} - ${imovel.endereco}, ${imovel.numero}`;
+            selectImovel.appendChild(option);
+        });
+        
+        // Preencher clientes
+        clientes.forEach(cliente => {
+            const optionInquilino = document.createElement('option');
+            optionInquilino.value = cliente.id;
+            optionInquilino.textContent = cliente.name;
+            selectInquilino.appendChild(optionInquilino);
+            
+            const optionFiador = document.createElement('option');
+            optionFiador.value = cliente.id;
+            optionFiador.textContent = cliente.name;
+            selectFiador.appendChild(optionFiador);
+        });
+    }
+    
+    // Atualizar resumo
+    function atualizarResumo() {
+        const total = contratos.length;
+        const ativos = contratos.filter(c => c.status === 'ativo').length;
+        
+        // Contratos vencendo em 30 dias
+        const hoje = new Date();
+        const em30Dias = new Date();
+        em30Dias.setDate(hoje.getDate() + 30);
+        
+        const vencendo = contratos.filter(c => {
+            if (c.status !== 'ativo') return false;
+            const dataFim = new Date(c.dataFim);
+            return dataFim >= hoje && dataFim <= em30Dias;
+        }).length;
+        
+        // Receita mensal
+        const receitaMensal = contratos
+            .filter(c => c.status === 'ativo')
+            .reduce((total, c) => {
+                const valorTotal = (parseFloat(c.valorAluguel) || 0) +
+                                 (parseFloat(c.valorCondominio) || 0) +
+                                 (parseFloat(c.valorIptu) || 0) +
+                                 (parseFloat(c.outrosValores) || 0);
+                return total + valorTotal;
+            }, 0);
+        
+        document.getElementById('totalContratos').textContent = total;
+        document.getElementById('contratosAtivos').textContent = ativos;
+        document.getElementById('contratosVencendo').textContent = vencendo;
+        document.getElementById('receitaMensalContratos').textContent = utils.formatCurrency(receitaMensal);
+    }
+    
+    // Renderizar contratos
+    function renderizarContratos() {
+        const contratosFiltrados = filtrarContratosArray();
+        
+        document.getElementById('totalContratosLista').textContent = `${contratosFiltrados.length} contrato(s) encontrado(s)`;
+        
+        if (contratosFiltrados.length === 0) {
+            mostrarEmptyState(true);
+            return;
+        }
+        
+        mostrarEmptyState(false);
+        
+        corpoTabela.innerHTML = contratosFiltrados.map(contrato => {
+            const imovel = imoveis.find(i => i.id === contrato.imovelId);
+            const inquilino = clientes.find(c => c.id === contrato.inquilinoId);
+            
+            const valorTotal = (parseFloat(contrato.valorAluguel) || 0) +
+                             (parseFloat(contrato.valorCondominio) || 0) +
+                             (parseFloat(contrato.valorIptu) || 0) +
+                             (parseFloat(contrato.outrosValores) || 0);
+            
+            return `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-contract text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${contrato.numero}</div>
+                                <div class="text-sm text-gray-500">Criado em ${utils.formatDate(contrato.createdAt)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${inquilino?.name || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${inquilino?.cpfCnpj || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${imovel?.codigo || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${imovel?.endereco || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${utils.formatDate(contrato.dataInicio)}</div>
+                        <div class="text-sm text-gray-500">até ${utils.formatDate(contrato.dataFim)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${utils.formatCurrency(valorTotal)}</div>
+                        <div class="text-sm text-gray-500">Venc. dia ${contrato.diaVencimento}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusClass(contrato.status)}">
+                            ${getStatusText(contrato.status)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <button onclick="editarContrato('${contrato.id}')" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="verContrato('${contrato.id}')" class="text-green-600 hover:text-green-900">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="renovarContrato('${contrato.id}')" class="text-purple-600 hover:text-purple-900">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                            <button onclick="encerrarContrato('${contrato.id}')" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+    
+    // Filtrar contratos
+    function filtrarContratosArray() {
+        const busca = document.getElementById('buscarContrato').value.toLowerCase();
+        const status = document.getElementById('filtroStatus').value;
+        const vencimento = document.getElementById('filtroVencimento').value;
+        const valor = document.getElementById('filtroValor').value;
+        
+        return contratos.filter(contrato => {
+            const imovel = imoveis.find(i => i.id === contrato.imovelId);
+            const inquilino = clientes.find(c => c.id === contrato.inquilinoId);
+            
+            const matchBusca = !busca || 
+                contrato.numero.toLowerCase().includes(busca) ||
+                (inquilino?.name || '').toLowerCase().includes(busca) ||
+                (imovel?.codigo || '').toLowerCase().includes(busca);
+            
+            const matchStatus = !status || contrato.status === status;
+            
+            let matchVencimento = true;
+            if (vencimento) {
+                const hoje = new Date();
+                const dataFim = new Date(contrato.dataFim);
+                
+                switch (vencimento) {
+                    case '30':
+                        const em30Dias = new Date();
+                        em30Dias.setDate(hoje.getDate() + 30);
+                        matchVencimento = dataFim >= hoje && dataFim <= em30Dias;
+                        break;
+                    case '60':
+                        const em60Dias = new Date();
+                        em60Dias.setDate(hoje.getDate() + 60);
+                        matchVencimento = dataFim >= hoje && dataFim <= em60Dias;
+                        break;
+                    case '90':
+                        const em90Dias = new Date();
+                        em90Dias.setDate(hoje.getDate() + 90);
+                        matchVencimento = dataFim >= hoje && dataFim <= em90Dias;
+                        break;
+                    case 'vencidos':
+                        matchVencimento = dataFim < hoje;
+                        break;
+                }
+            }
+            
+            let matchValor = true;
+            if (valor) {
+                const valorTotal = (parseFloat(contrato.valorAluguel) || 0) +
+                                 (parseFloat(contrato.valorCondominio) || 0) +
+                                 (parseFloat(contrato.valorIptu) || 0) +
+                                 (parseFloat(contrato.outrosValores) || 0);
+                
+                switch (valor) {
+                    case '0-1000':
+                        matchValor = valorTotal <= 1000;
+                        break;
+                    case '1000-2000':
+                        matchValor = valorTotal > 1000 && valorTotal <= 2000;
+                        break;
+                    case '2000-5000':
+                        matchValor = valorTotal > 2000 && valorTotal <= 5000;
+                        break;
+                    case '5000+':
+                        matchValor = valorTotal > 5000;
+                        break;
+                }
+            }
+            
+            return matchBusca && matchStatus && matchVencimento && matchValor;
+        });
+    }
+    
+    function filtrarContratos() {
+        renderizarContratos();
+    }
+    
+    function limparFiltros() {
+        document.getElementById('buscarContrato').value = '';
+        document.getElementById('filtroStatus').value = '';
+        document.getElementById('filtroVencimento').value = '';
+        document.getElementById('filtroValor').value = '';
+        filtrarContratos();
+    }
+    
+    // Modal
+    function abrirModalContrato(contrato = null) {
+        contratoEditando = contrato;
+        tituloModal.textContent = contrato ? 'Editar Contrato' : 'Novo Contrato';
+        
+        if (contrato) {
+            preencherFormulario(contrato);
+        } else {
+            formContrato.reset();
+            // Definir valores padrão
+            document.getElementById('jurosContrato').value = '1';
+            document.getElementById('multaContrato').value = '2';
+            document.getElementById('diasDescontoContrato').value = '5';
+            document.getElementById('reajusteContrato').value = 'igpm';
+        }
+        
+        modalContrato.classList.remove('hidden');
+    }
+    
+    function fecharModalContrato() {
+        modalContrato.classList.add('hidden');
+        contratoEditando = null;
+        formContrato.reset();
+    }
+    
+    function preencherFormulario(contrato) {
+        Object.keys(contrato).forEach(key => {
+            const input = document.querySelector(`[name="${key}"]`);
+            if (input) {
+                if (input.type === 'date') {
+                    input.value = contrato[key] ? contrato[key].split('T')[0] : '';
+                } else {
+                    input.value = contrato[key] || '';
+                }
+            }
+        });
+    }
+    
+    // Salvar contrato
+    async function salvarContrato(e) {
+        e.preventDefault();
+        
+        try {
+            utils.showLoading();
+            
+            const formData = new FormData(formContrato);
+            const dadosContrato = Object.fromEntries(formData.entries());
+            
+            let response;
+            if (contratoEditando) {
+                response = await utils.request(`/contratos/${contratoEditando.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(dadosContrato)
+                });
+            } else {
+                response = await utils.request('/api/contratos', {
+                    method: 'POST',
+                    body: JSON.stringify(dadosContrato)
+                });
+            }
+            
+            utils.showToast(
+                contratoEditando ? 'Contrato atualizado com sucesso!' : 'Contrato criado com sucesso!',
+                'success'
+            );
+            
+            fecharModalContrato();
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao salvar contrato:', error);
+            utils.showToast(error.message || 'Erro ao salvar contrato', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Funções globais
+    window.editarContrato = async function(id) {
+        try {
+            const response = await utils.request(`/contratos/${id}`);
+            abrirModalContrato(response.data);
+        } catch (error) {
+            console.error('Erro ao carregar contrato:', error);
+            utils.showToast('Erro ao carregar dados do contrato', 'error');
+        }
+    };
+    
+    window.verContrato = function(id) {
+        utils.showToast('Funcionalidade em desenvolvimento', 'info');
+    };
+    
+    window.renovarContrato = async function(id) {
+        if (!confirm('Tem certeza que deseja renovar este contrato?')) {
+            return;
+        }
+        
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/contratos/${id}/renovar`, {
+                method: 'POST'
+            });
+            
+            utils.showToast('Contrato renovado com sucesso!', 'success');
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao renovar contrato:', error);
+            utils.showToast(error.message || 'Erro ao renovar contrato', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    window.encerrarContrato = async function(id) {
+        if (!confirm('Tem certeza que deseja encerrar este contrato?')) {
+            return;
+        }
+        
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/contratos/${id}/encerrar`, {
+                method: 'POST'
+            });
+            
+            utils.showToast('Contrato encerrado com sucesso!', 'success');
+            await carregarDados();
+            
+        } catch (error) {
+            console.error('Erro ao encerrar contrato:', error);
+            utils.showToast(error.message || 'Erro ao encerrar contrato', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    // Utilitários
+    function getStatusClass(status) {
+        const classes = {
+            'ativo': 'bg-green-100 text-green-800',
+            'encerrado': 'bg-gray-100 text-gray-800',
+            'vencido': 'bg-red-100 text-red-800'
+        };
+        return classes[status] || 'bg-gray-100 text-gray-800';
+    }
+    
+    function getStatusText(status) {
+        const texts = {
+            'ativo': 'Ativo',
+            'encerrado': 'Encerrado',
+            'vencido': 'Vencido'
+        };
+        return texts[status] || status;
+    }
+    
+    function mostrarLoading(show) {
+        loadingContratos.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function mostrarEmptyState(show) {
+        emptyState.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Inicializar - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        carregarDados();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                carregarDados();
+            }
+        }, 100);
+    }
+});
+</script>

@@ -1,0 +1,592 @@
+<!-- Header da página -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Clientes/Inquilinos</h1>
+        <p class="text-gray-600">Gerencie os dados dos seus clientes e inquilinos</p>
+    </div>
+    <button id="novoClienteBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Novo Cliente
+    </button>
+</div>
+
+<!-- Filtros e busca -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
+            <div class="relative">
+                <input type="text" id="buscarCliente" placeholder="Nome, CPF/CNPJ ou email..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+            <select id="filtroTipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="FISICA">Pessoa Física</option>
+                <option value="JURIDICA">Pessoa Jurídica</option>
+            </select>
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select id="filtroStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+        </div>
+        
+        <div class="flex items-end">
+            <button id="limparFiltros" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                <i class="fas fa-times mr-2"></i>
+                Limpar Filtros
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de clientes -->
+<div class="bg-white rounded-lg shadow-sm">
+    <div class="p-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Lista de Clientes</h2>
+            <div class="flex items-center space-x-4">
+                <span id="totalClientes" class="text-sm text-gray-500">0 clientes encontrados</span>
+                <div class="flex items-center space-x-2">
+                    <button id="visualizacaoGrid" class="p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button id="visualizacaoLista" class="p-2 text-blue-600">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de clientes -->
+    <div id="tabelaClientes" class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaClientes" class="bg-white divide-y divide-gray-200">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loadingClientes" class="hidden p-8 text-center">
+        <div class="inline-flex items-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+            <span class="text-gray-600">Carregando clientes...</span>
+        </div>
+    </div>
+    
+    <!-- Empty state -->
+    <div id="emptyStateClientes" class="hidden p-8 text-center">
+        <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum cliente encontrado</h3>
+        <p class="text-gray-500 mb-4">Comece adicionando seu primeiro cliente ao sistema.</p>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Adicionar Cliente
+        </button>
+    </div>
+    
+    <!-- Paginação -->
+    <div id="paginacaoClientes" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+        <div class="text-sm text-gray-500">
+            Mostrando <span id="paginaAtual">1</span> de <span id="totalPaginas">1</span> páginas
+        </div>
+        <div class="flex space-x-2">
+            <button id="paginaAnterior" class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50">
+                Anterior
+            </button>
+            <button id="proximaPagina" class="px-3 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-50 disabled:opacity-50">
+                Próxima
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Cliente -->
+<div id="modalCliente" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <h3 id="tituloModalCliente" class="text-lg font-semibold text-gray-900">Novo Cliente</h3>
+                <button id="fecharModalCliente" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <form id="formCliente" class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dados básicos -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Dados Básicos</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome/Razão Social *</label>
+                    <input type="text" id="nomeCliente" name="name" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CPF/CNPJ *</label>
+                    <input type="text" id="documentoCliente" name="cpfCnpj" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                    <input type="email" id="emailCliente" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                    <input type="tel" id="telefoneCliente" name="phone"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Endereço -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Endereço</h4>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CEP</label>
+                    <input type="text" id="cepCliente" name="postalCode"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Logradouro</label>
+                    <input type="text" id="logradouroCliente" name="address"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Número</label>
+                    <input type="text" id="numeroCliente" name="addressNumber"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Complemento</label>
+                    <input type="text" id="complementoCliente" name="complement"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bairro</label>
+                    <input type="text" id="bairroCliente" name="province"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cidade</label>
+                    <input type="text" id="cidadeCliente" name="city"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <!-- Informações adicionais -->
+                <div class="md:col-span-2">
+                    <h4 class="text-md font-medium text-gray-900 mb-4 mt-6">Informações Adicionais</h4>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Observações</label>
+                    <textarea id="observacoesCliente" name="observations" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Informações adicionais sobre o cliente/inquilino..."></textarea>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelarCliente" class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                    <i class="fas fa-save mr-2"></i>
+                    Salvar Cliente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let clientes = [];
+    let clienteEditando = null;
+    let paginaAtual = 1;
+    const itensPorPagina = 10;
+    
+    // Elementos do DOM
+    const modalCliente = document.getElementById('modalCliente');
+    const formCliente = document.getElementById('formCliente');
+    const tituloModal = document.getElementById('tituloModalCliente');
+    const corpoTabela = document.getElementById('corpoTabelaClientes');
+    const loadingClientes = document.getElementById('loadingClientes');
+    const emptyState = document.getElementById('emptyStateClientes');
+    
+    // Event listeners
+    document.getElementById('novoClienteBtn').addEventListener('click', () => abrirModalCliente());
+    document.getElementById('fecharModalCliente').addEventListener('click', fecharModalCliente);
+    document.getElementById('cancelarCliente').addEventListener('click', fecharModalCliente);
+    document.getElementById('buscarCliente').addEventListener('input', debounce(filtrarClientes, 300));
+    document.getElementById('filtroTipo').addEventListener('change', filtrarClientes);
+    document.getElementById('filtroStatus').addEventListener('change', filtrarClientes);
+    document.getElementById('limparFiltros').addEventListener('click', limparFiltros);
+    
+    formCliente.addEventListener('submit', salvarCliente);
+    
+    // Máscara para CPF/CNPJ
+    document.getElementById('documentoCliente').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length <= 11) {
+            // CPF
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        } else {
+            // CNPJ
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        }
+        
+        e.target.value = value;
+    });
+    
+    // Máscara para telefone
+    document.getElementById('telefoneCliente').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length <= 10) {
+            value = value.replace(/(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+            value = value.replace(/(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        }
+        
+        e.target.value = value;
+    });
+    
+    // Máscara para CEP
+    document.getElementById('cepCliente').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+    });
+    
+    // Buscar CEP
+    document.getElementById('cepCliente').addEventListener('blur', async function(e) {
+        const cep = e.target.value.replace(/\D/g, '');
+        
+        if (cep.length === 8) {
+            try {
+                const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await response.json();
+                
+                if (!data.erro) {
+                    document.getElementById('logradouroCliente').value = data.logradouro;
+                    document.getElementById('bairroCliente').value = data.bairro;
+                    document.getElementById('cidadeCliente').value = data.localidade;
+                }
+            } catch (error) {
+                console.error('Erro ao buscar CEP:', error);
+            }
+        }
+    });
+    
+    // Carregar clientes
+    async function carregarClientes() {
+        try {
+            mostrarLoading(true);
+            
+            const response = await utils.request('/api/clientes');
+            clientes = response.data || [];
+            
+            renderizarClientes();
+            
+        } catch (error) {
+            console.error('Erro ao carregar clientes:', error);
+            utils.showToast('Erro ao carregar clientes', 'error');
+            mostrarEmptyState(true);
+        } finally {
+            mostrarLoading(false);
+        }
+    }
+    
+    // Renderizar clientes
+    function renderizarClientes() {
+        const clientesFiltrados = filtrarClientesArray();
+        const totalPaginas = Math.ceil(clientesFiltrados.length / itensPorPagina);
+        const inicio = (paginaAtual - 1) * itensPorPagina;
+        const fim = inicio + itensPorPagina;
+        const clientesPagina = clientesFiltrados.slice(inicio, fim);
+        
+        document.getElementById('totalClientes').textContent = `${clientesFiltrados.length} cliente(s) encontrado(s)`;
+        
+        if (clientesPagina.length === 0) {
+            mostrarEmptyState(true);
+            return;
+        }
+        
+        mostrarEmptyState(false);
+        
+        corpoTabela.innerHTML = clientesPagina.map(cliente => `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${cliente.name}</div>
+                            <div class="text-sm text-gray-500">${cliente.email || 'Sem email'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${cliente.cpfCnpj}</div>
+                    <div class="text-sm text-gray-500">${cliente.cpfCnpj?.length > 14 ? 'CNPJ' : 'CPF'}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${cliente.phone || 'Não informado'}</div>
+                    <div class="text-sm text-gray-500">${cliente.email || ''}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full ${cliente.personType === 'FISICA' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                        ${cliente.personType === 'FISICA' ? 'Pessoa Física' : 'Pessoa Jurídica'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                        Ativo
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <button onclick="editarCliente('${cliente.id}')" class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="verCliente('${cliente.id}')" class="text-green-600 hover:text-green-900">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="excluirCliente('${cliente.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        
+        // Atualizar paginação
+        document.getElementById('paginaAtual').textContent = paginaAtual;
+        document.getElementById('totalPaginas').textContent = totalPaginas;
+        document.getElementById('paginaAnterior').disabled = paginaAtual === 1;
+        document.getElementById('proximaPagina').disabled = paginaAtual === totalPaginas;
+    }
+    
+    // Filtrar clientes
+    function filtrarClientesArray() {
+        const busca = document.getElementById('buscarCliente').value.toLowerCase();
+        const tipo = document.getElementById('filtroTipo').value;
+        const status = document.getElementById('filtroStatus').value;
+        
+        return clientes.filter(cliente => {
+            const matchBusca = !busca || 
+                cliente.name.toLowerCase().includes(busca) ||
+                cliente.cpfCnpj.includes(busca) ||
+                (cliente.email && cliente.email.toLowerCase().includes(busca));
+            
+            const matchTipo = !tipo || cliente.personType === tipo;
+            const matchStatus = !status; // Por enquanto todos são ativos
+            
+            return matchBusca && matchTipo && matchStatus;
+        });
+    }
+    
+    function filtrarClientes() {
+        paginaAtual = 1;
+        renderizarClientes();
+    }
+    
+    function limparFiltros() {
+        document.getElementById('buscarCliente').value = '';
+        document.getElementById('filtroTipo').value = '';
+        document.getElementById('filtroStatus').value = '';
+        filtrarClientes();
+    }
+    
+    // Modal
+    function abrirModalCliente(cliente = null) {
+        clienteEditando = cliente;
+        tituloModal.textContent = cliente ? 'Editar Cliente' : 'Novo Cliente';
+        
+        if (cliente) {
+            preencherFormulario(cliente);
+        } else {
+            formCliente.reset();
+        }
+        
+        modalCliente.classList.remove('hidden');
+    }
+    
+    function fecharModalCliente() {
+        modalCliente.classList.add('hidden');
+        clienteEditando = null;
+        formCliente.reset();
+    }
+    
+    function preencherFormulario(cliente) {
+        document.getElementById('nomeCliente').value = cliente.name || '';
+        document.getElementById('documentoCliente').value = cliente.cpfCnpj || '';
+        document.getElementById('emailCliente').value = cliente.email || '';
+        document.getElementById('telefoneCliente').value = cliente.phone || '';
+        document.getElementById('cepCliente').value = cliente.postalCode || '';
+        document.getElementById('logradouroCliente').value = cliente.address || '';
+        document.getElementById('numeroCliente').value = cliente.addressNumber || '';
+        document.getElementById('complementoCliente').value = cliente.complement || '';
+        document.getElementById('bairroCliente').value = cliente.province || '';
+        document.getElementById('cidadeCliente').value = cliente.city || '';
+        document.getElementById('observacoesCliente').value = cliente.observations || '';
+    }
+    
+    // Salvar cliente
+    async function salvarCliente(e) {
+        e.preventDefault();
+        
+        try {
+            utils.showLoading();
+            
+            const formData = new FormData(formCliente);
+            const dadosCliente = Object.fromEntries(formData.entries());
+            
+            let response;
+            if (clienteEditando) {
+                response = await utils.request(`/clientes/${clienteEditando.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(dadosCliente)
+                });
+            } else {
+                response = await utils.request('/api/clientes', {
+                    method: 'POST',
+                    body: JSON.stringify(dadosCliente)
+                });
+            }
+            
+            utils.showToast(
+                clienteEditando ? 'Cliente atualizado com sucesso!' : 'Cliente criado com sucesso!',
+                'success'
+            );
+            
+            fecharModalCliente();
+            await carregarClientes();
+            
+        } catch (error) {
+            console.error('Erro ao salvar cliente:', error);
+            utils.showToast(error.message || 'Erro ao salvar cliente', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    }
+    
+    // Funções globais
+    window.editarCliente = async function(id) {
+        try {
+            const response = await utils.request(`/clientes/${id}`);
+            abrirModalCliente(response.data);
+        } catch (error) {
+            console.error('Erro ao carregar cliente:', error);
+            utils.showToast('Erro ao carregar dados do cliente', 'error');
+        }
+    };
+    
+    window.verCliente = function(id) {
+        // Implementar visualização detalhada
+        utils.showToast('Funcionalidade em desenvolvimento', 'info');
+    };
+    
+    window.excluirCliente = async function(id) {
+        if (!confirm('Tem certeza que deseja excluir este cliente?')) {
+            return;
+        }
+        
+        try {
+            utils.showLoading();
+            
+            await utils.request(`/clientes/${id}`, {
+                method: 'DELETE'
+            });
+            
+            utils.showToast('Cliente excluído com sucesso!', 'success');
+            await carregarClientes();
+            
+        } catch (error) {
+            console.error('Erro ao excluir cliente:', error);
+            utils.showToast(error.message || 'Erro ao excluir cliente', 'error');
+        } finally {
+            utils.hideLoading();
+        }
+    };
+    
+    // Utilitários
+    function mostrarLoading(show) {
+        loadingClientes.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function mostrarEmptyState(show) {
+        emptyState.classList.toggle('hidden', !show);
+        corpoTabela.parentElement.classList.toggle('hidden', show);
+    }
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Inicializar - aguardar utils estar disponível
+    if (typeof utils !== 'undefined') {
+        carregarClientes();
+    } else {
+        // Aguardar utils estar disponível
+        const checkUtils = setInterval(() => {
+            if (typeof utils !== 'undefined') {
+                clearInterval(checkUtils);
+                carregarClientes();
+            }
+        }, 100);
+    }
+});
+</script>

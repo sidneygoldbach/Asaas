@@ -354,6 +354,10 @@ async function carregarResumoFinanceiro() {
             document.getElementById('saldoDisponivel').textContent = 
                 `R$ ${resumo.saldoDisponivel.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             
+            // Atualizar saldo atual no cabeçalho
+            document.getElementById('saldoAtual').textContent = 
+                `R$ ${resumo.saldoDisponivel.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
             // Atualizar receitas do mês
             document.getElementById('receitasMes').textContent = 
                 `R$ ${resumo.receitasMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -412,6 +416,9 @@ async function carregarDadosConta() {
         if (response.success) {
             document.getElementById('saldoAtual').textContent = 
                 new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(response.data.saldo);
+            // Também atualizar o saldo disponível para manter consistência
+            document.getElementById('saldoDisponivel').textContent = 
+                new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(response.data.saldoDisponivel);
             document.getElementById('contaNumero').textContent = 
                 `Ag: ${response.data.agencia} • CC: ${response.data.contaNumero}`;
         }
@@ -631,6 +638,9 @@ async function realizarTransferencia(event) {
             
             // Atualizar saldo na tela
             document.getElementById('saldoAtual').textContent = 
+                `R$ ${response.novoSaldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            // Também atualizar o saldo disponível para manter consistência
+            document.getElementById('saldoDisponivel').textContent = 
                 `R$ ${response.novoSaldo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             
             // Limpar formulário

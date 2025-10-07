@@ -1,19 +1,28 @@
 <!-- Header da página -->
-<div class="flex items-center justify-between mb-6">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900">Cobranças</h1>
-        <p class="text-gray-600">Gerencie as cobranças de aluguel e gere boletos</p>
+<div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-lg mb-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold mb-2">💳 Cobranças</h1>
+            <p class="text-blue-100">Gerencie as cobranças de aluguel e gere boletos</p>
+        </div>
+        <div class="text-right">
+            <p class="text-blue-100 text-sm">Saldo Atual</p>
+            <p class="text-3xl font-bold" id="saldoAtualCobrancas">R$ 0,00</p>
+            <p class="text-blue-100 text-xs">Conta Asaas</p>
+        </div>
     </div>
-    <div class="flex space-x-3">
-        <button id="novaCobrancaBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
-            <i class="fas fa-plus mr-2"></i>
-            Nova Cobrança
-        </button>
-        <button id="cobrancaRecorrenteBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
-            <i class="fas fa-sync mr-2"></i>
-            Cobrança Recorrente
-        </button>
-    </div>
+</div>
+
+<!-- Botões de ação -->
+<div class="flex justify-end space-x-3 mb-6">
+    <button id="novaCobrancaBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+        <i class="fas fa-plus mr-2"></i>
+        Nova Cobrança
+    </button>
+    <button id="cobrancaRecorrenteBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center">
+        <i class="fas fa-sync mr-2"></i>
+        Cobrança Recorrente
+    </button>
 </div>
 
 <!-- Cards de resumo -->
@@ -466,15 +475,25 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             mostrarLoading(true);
             
-            const [cobrancasResponse, clientesResponse, imoveisResponse] = await Promise.all([
+            const [cobrancasResponse, clientesResponse, imoveisResponse, resumoResponse] = await Promise.all([
                 utils.request('/api/cobrancas'),
                 utils.request('/api/clientes'),
-                utils.request('/api/imoveis')
+                utils.request('/api/imoveis'),
+                utils.request('/api/financeiro/api/resumo-financeiro')
             ]);
             
             cobrancas = cobrancasResponse.data || [];
             clientes = clientesResponse.data || [];
             imoveis = imoveisResponse.data || [];
+            
+            // Atualizar saldo no cabeçalho
+            const resumo = resumoResponse.resumo;
+            if (resumo && resumo.saldoDisponivel !== undefined) {
+                const saldoElement = document.getElementById('saldoAtualCobrancas');
+                if (saldoElement) {
+                    saldoElement.textContent = utils.formatCurrency(resumo.saldoDisponivel);
+                }
+            }
             
             preencherSelects();
             atualizarResumo();

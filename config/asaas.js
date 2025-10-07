@@ -151,8 +151,10 @@ class AsaasAPI {
   async obterSaldoConta() {
     try {
       const response = await this.client.get('/finance/balance');
+      console.log('Resposta completa da API Asaas:', JSON.stringify(response.data, null, 2));
       return response.data;
     } catch (error) {
+      console.error('Erro na API Asaas:', error.response?.data || error.message);
       throw new Error(`Erro ao obter saldo da conta: ${error.response?.data?.errors?.[0]?.description || error.message}`);
     }
   }

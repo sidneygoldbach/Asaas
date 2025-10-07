@@ -128,9 +128,9 @@ router.get('/api/conta', cacheMiddleware(120), async (req, res) => {
         res.json({
             success: true,
             data: {
-                saldo: saldo.totalBalance || 0,
-                saldoDisponivel: saldo.availableBalance || 0,
-                saldoBloqueado: saldo.blockedBalance || 0,
+                saldo: saldo.balance || 0,
+                saldoDisponivel: saldo.balance || 0, // A API Asaas retorna apenas 'balance'
+                saldoBloqueado: 0, // Não disponível na resposta da API
                 contaNumero: '12345-6', // Número da conta fictício
                 agencia: '0001'
             }
@@ -447,7 +447,7 @@ router.get('/api/resumo-financeiro', cacheMiddleware(300), async (req, res) => {
         const despesasMes = receitasMes * 0.4; // 40% das receitas como despesas estimadas
         
         const resumo = {
-            saldoDisponivel: saldo.totalBalance || 0,
+            saldoDisponivel: saldo.balance || 0,
             receitasMes: receitasMes,
             despesasMes: despesasMes,
             resultadoMes: receitasMes - despesasMes

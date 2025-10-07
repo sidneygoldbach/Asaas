@@ -1,7 +1,7 @@
 {
   "name": "sistema-imoveis-asaas",
   "version": "1.0.0",
-  "description": "Sistema de Administração de Imóveis Alugados com API Asaas",
+  "description": "Sistema de Administração de Imóveis Alugados com API Asaas - Inclui módulo financeiro 'Meu Dinheiro' com consulta de saldo, transferências e pagamento de contas",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -35,7 +35,11 @@
     "aluguel",
     "asaas",
     "cobranca",
-    "administracao"
+    "administracao",
+    "financeiro",
+    "transferencia",
+    "pagamento",
+    "cache"
   ],
   "author": "Sistema Imóveis",
   "license": "MIT"

@@ -35,6 +35,14 @@ Sistema completo para administração de imóveis alugados integrado com a API d
 - Controle de juros e multas
 - Pagamentos via PIX e cartão
 
+### 💳 Módulo Financeiro "Meu Dinheiro"
+- **Consulta de Saldo e Extrato**: Visualização em tempo real do saldo da conta e histórico de transações
+- **Transferências**: Realização de transferências bancárias diretamente pelo sistema
+- **Pagamento de Contas**: Consulta e pagamento de boletos via código de barras
+- **Cache Inteligente**: Sistema de cache otimizado para melhor performance
+- **Tratamento de Erros**: Mensagens específicas e amigáveis para erros da API Asaas
+- **Interface Responsiva**: Design moderno e intuitivo para gestão financeira
+
 ### 📈 Relatórios
 - Relatórios financeiros detalhados
 - Análise de inadimplência
@@ -147,12 +155,15 @@ O sistema estará disponível em: http://localhost:3000
 sistema-imoveis-asaas/
 ├── config/
 │   └── asaas.js              # Configuração da API do Asaas
+├── middleware/
+│   └── cache.js              # Sistema de cache para otimização de performance
 ├── routes/
 │   ├── index.js              # Rotas principais
 │   ├── clientes.js           # Gestão de clientes
 │   ├── imoveis.js            # Gestão de imóveis
 │   ├── contratos.js          # Gestão de contratos
 │   ├── cobrancas.js          # Gestão de cobranças
+│   ├── financeiro.js         # Módulo financeiro "Meu Dinheiro"
 │   └── dashboard.js          # Dashboard e relatórios
 ├── views/
 │   ├── layout.ejs            # Layout base
@@ -161,6 +172,7 @@ sistema-imoveis-asaas/
 │   ├── imoveis.ejs           # Gestão de imóveis
 │   ├── contratos.ejs         # Gestão de contratos
 │   ├── cobrancas.ejs         # Gestão de cobranças
+│   ├── financeiro.ejs        # Interface do módulo financeiro
 │   └── relatorios.ejs        # Relatórios
 ├── public/
 │   ├── css/
@@ -197,6 +209,9 @@ sistema-imoveis-asaas/
 - **Assinaturas**: Cobranças recorrentes
 - **Webhooks**: Notificações de pagamento
 - **Relatórios**: Extratos e análises
+- **Módulo Financeiro**: Consulta de saldo, extrato, transferências e pagamento de contas
+- **Sistema de Cache**: Otimização de performance com cache inteligente
+- **Tratamento de Erros**: Mensagens específicas para diferentes tipos de erro da API
 
 ### 🔄 Planejadas
 - **Split de Pagamentos**: Divisão automática
@@ -250,6 +265,9 @@ Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes
 - ✅ Integração com API do Asaas
 - ✅ Dashboard com métricas em tempo real
 - ✅ Geração de boletos e cobranças
+- ✅ Módulo financeiro "Meu Dinheiro" com consulta de saldo, extrato, transferências e pagamento de contas
+- ✅ Sistema de cache inteligente para otimização de performance
+- ✅ Tratamento específico de erros da API Asaas
 - ✅ Relatórios financeiros
 - ✅ Interface responsiva
 

@@ -47,22 +47,22 @@
                 <div class="space-y-4">
                     <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                         <span class="text-sm text-gray-600">Saldo Disponível</span>
-                        <span class="font-semibold text-green-600">R$ <%= conta.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></span>
+                        <span class="font-semibold text-green-600" id="saldoDisponivel">R$ <%= conta.saldo.toLocaleString('pt-BR', {minimumFractionDigits: 2}) %></span>
                     </div>
                     
                     <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                         <span class="text-sm text-gray-600">Receitas do Mês</span>
-                        <span class="font-semibold text-blue-600">R$ 4.300,00</span>
+                        <span class="font-semibold text-blue-600" id="receitasMes">Carregando...</span>
                     </div>
                     
                     <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                         <span class="text-sm text-gray-600">Despesas do Mês</span>
-                        <span class="font-semibold text-red-600">R$ 1.770,50</span>
+                        <span class="font-semibold text-red-600" id="despesasMes">Carregando...</span>
                     </div>
                     
                     <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                         <span class="text-sm text-gray-600">Resultado do Mês</span>
-                        <span class="font-semibold text-purple-600">R$ 2.529,50</span>
+                        <span class="font-semibold text-purple-600" id="resultadoMes">Carregando...</span>
                     </div>
                 </div>
             </div>
@@ -307,6 +307,7 @@ let paginaAtual = 1;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
+    carregarResumoFinanceiro();
     carregarExtrato();
     carregarContas();
     
@@ -340,6 +341,48 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listener para formulário de pagamento
     document.getElementById('formPagamento').addEventListener('submit', pagarConta);
 });
+
+// Função para carregar resumo financeiro
+async function carregarResumoFinanceiro() {
+    try {
+        const response = await utils.request('/api/financeiro/api/resumo-financeiro');
+        
+        if (response.success && response.resumo) {
+            const resumo = response.resumo;
+            
+            // Atualizar saldo disponível
+            document.getElementById('saldoDisponivel').textContent = 
+                `R$ ${resumo.saldoDisponivel.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Atualizar receitas do mês
+            document.getElementById('receitasMes').textContent = 
+                `R$ ${resumo.receitasMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Atualizar despesas do mês
+            document.getElementById('despesasMes').textContent = 
+                `R$ ${resumo.despesasMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Atualizar resultado do mês
+            const resultadoElement = document.getElementById('resultadoMes');
+            resultadoElement.textContent = 
+                `R$ ${resumo.resultadoMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            
+            // Alterar cor baseado no resultado
+            if (resumo.resultadoMes >= 0) {
+                resultadoElement.className = 'font-semibold text-green-600';
+            } else {
+                resultadoElement.className = 'font-semibold text-red-600';
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar resumo financeiro:', error);
+        
+        // Mostrar erro nos elementos
+        document.getElementById('receitasMes').textContent = 'Erro ao carregar';
+        document.getElementById('despesasMes').textContent = 'Erro ao carregar';
+        document.getElementById('resultadoMes').textContent = 'Erro ao carregar';
+    }
+}
 
 // Função para trocar de aba
 function switchTab(tabId) {

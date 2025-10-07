@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const asaas = require('../config/asaas');
+const AsaasAPI = require('../config/asaas');
 const moment = require('moment');
+
+// Instância da API Asaas
+const asaas = new AsaasAPI();
 
 // Listar todas as cobranças
 router.get('/', async (req, res) => {

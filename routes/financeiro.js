@@ -82,11 +82,42 @@ function tratarErroAsaas(error) {
 }
 
 // Página principal do módulo financeiro
-router.get('/', (req, res) => {
-    res.render('financeiro', { 
-        title: 'Meu Dinheiro',
-        page: 'financeiro'
-    });
+router.get('/', async (req, res) => {
+    try {
+        // Carregar dados básicos da conta para exibir na página
+        const saldo = await asaas.obterSaldoConta();
+        
+        const contaData = {
+            saldo: saldo.totalBalance || 0,
+            numero: saldo.accountNumber || 'N/A',
+            agencia: saldo.agency || 'N/A'
+        };
+        
+        res.render('financeiro', { 
+            title: 'Meu Dinheiro',
+            page: 'financeiro',
+            conta: contaData,
+            contasPendentes: [], // Array vazio por padrão, será carregado via AJAX
+            extratoRecente: [] // Array vazio por padrão, será carregado via AJAX
+        });
+    } catch (error) {
+        console.error('Erro ao carregar página financeiro:', error);
+        
+        // Em caso de erro, renderizar com dados padrão
+        const contaData = {
+            saldo: 0,
+            numero: 'N/A',
+            agencia: 'N/A'
+        };
+        
+        res.render('financeiro', { 
+            title: 'Meu Dinheiro',
+            page: 'financeiro',
+            conta: contaData,
+            contasPendentes: [], // Array vazio por padrão
+            extratoRecente: [] // Array vazio por padrão
+        });
+    }
 });
 
 // API - Obter dados da conta corrente (com cache de 2 minutos)
@@ -248,6 +279,50 @@ router.post('/api/transferencias', async (req, res) => {
 });
 
 // API: Listar contas a pagar (com cache de 1 minuto)
+router.get('/api/contas-pagar', cacheMiddleware(60), async (req, res) => {
+    try {
+        const { page = 1, limit = 10, status } = req.query;
+        
+        const filtros = {
+            offset: (page - 1) * limit,
+            limit: parseInt(limit)
+        };
+        
+        // Filtrar por status se especificado
+        if (status && status !== 'todos') {
+            filtros.status = status;
+        }
+        
+        const pagamentos = await asaas.listarPagamentos(filtros);
+        
+        // Formatar dados para o frontend
+        const contasFormatadas = pagamentos.data?.map(pagamento => ({
+            id: pagamento.id,
+            data: asaas.formatarData(pagamento.paymentDate || pagamento.dateCreated),
+            descricao: pagamento.description || 'Pagamento de conta',
+            valor: pagamento.value,
+            valorFormatado: asaas.formatarMoeda(pagamento.value),
+            status: pagamento.status,
+            codigoBarras: pagamento.identificationField,
+            vencimento: pagamento.dueDate ? asaas.formatarData(pagamento.dueDate) : null
+        })) || [];
+        
+        res.json({
+            success: true,
+            data: contasFormatadas,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil((pagamentos.totalCount || 0) / limit),
+                totalItems: pagamentos.totalCount || 0
+            }
+        });
+    } catch (error) {
+        const errorResponse = tratarErroAsaas(error);
+        res.status(500).json(errorResponse);
+    }
+});
+
+// API: Listar contas (rota alternativa para compatibilidade)
 router.get('/api/contas', cacheMiddleware(60), async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
@@ -340,6 +415,47 @@ router.get('/api/consultar-conta/:codigoBarras', longTermCacheMiddleware(1800), 
             }
         });
     } catch (error) {
+        const errorResponse = tratarErroAsaas(error);
+        res.status(500).json(errorResponse);
+    }
+});
+
+// Endpoint para resumo financeiro
+router.get('/api/resumo-financeiro', cacheMiddleware(300), async (req, res) => {
+    try {
+        // Buscar saldo da conta
+        const saldo = await asaas.obterSaldoConta();
+        
+        // Buscar cobranças do mês atual para calcular receitas
+        const dataAtual = new Date();
+        const primeiroDiaMes = new Date(dataAtual.getFullYear(), dataAtual.getMonth(), 1);
+        const ultimoDiaMes = new Date(dataAtual.getFullYear(), dataAtual.getMonth() + 1, 0);
+        
+        const cobrancas = await asaas.listarCobrancas({
+            dateCreated: `${primeiroDiaMes.toISOString().split('T')[0]}[TO]${ultimoDiaMes.toISOString().split('T')[0]}`,
+            status: 'RECEIVED',
+            limit: 100
+        });
+        
+        // Calcular receitas do mês
+        const receitasMes = cobrancas.data?.reduce((total, cobranca) => {
+            return total + (cobranca.value || 0);
+        }, 0) || 0;
+        
+        // Para despesas, vamos usar uma estimativa baseada no histórico
+        // Em uma implementação real, você teria uma tabela de despesas
+        const despesasMes = receitasMes * 0.4; // 40% das receitas como despesas estimadas
+        
+        const resumo = {
+            saldoDisponivel: saldo.totalBalance || 0,
+            receitasMes: receitasMes,
+            despesasMes: despesasMes,
+            resultadoMes: receitasMes - despesasMes
+        };
+        
+        res.json({ success: true, resumo });
+    } catch (error) {
+        console.error('Erro ao buscar resumo financeiro:', error);
         const errorResponse = tratarErroAsaas(error);
         res.status(500).json(errorResponse);
     }
